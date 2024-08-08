@@ -24,3 +24,41 @@ Après avoir lu en détail le cahier des charges, vous vous préparez à vous re
 ```{r}
 data <- read.csv("data_raw/billets.csv", sep =";")
 ```
+
+```{r}
+summary(data)
+```
+
+```{r}
+install.packages("skimr")
+library(skimr)
+
+skim(data)
+
+```
+
+```{r}
+valeur_unique <- unique(data$is_genuine)
+print(valeur_unique)
+```
+
+```{r}
+valeur_compte <- table(data$is_genuine)
+print(valeur_compte)
+```
+
+```{r}
+install.packages("dplyr")
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+resultats <- data %>%
+  group_by(is_genuine) %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE))
+
+print(resultats)
+```
