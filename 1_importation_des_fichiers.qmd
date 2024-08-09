@@ -25,33 +25,64 @@ Après avoir lu en détail le cahier des charges, vous vous préparez à vous re
 data <- read.csv("data_raw/billets.csv", sep =";")
 ```
 
+## Résumé des datas
+
 ```{r}
 summary(data)
 ```
 
+Nous avons un dataframe de 7 colonnes et 1 500 lignes
+
+1 colonne de type character
+
+6 colonnes numériques
+
+## Description des variables numériques
+
 ```{r}
-install.packages("skimr")
+if (!require(skimr)) install.packages("skimr")
 library(skimr)
 
 skim(data)
 
 ```
 
+Nous avons 37 valeurs manquantes dans la colonne margin_low
+
 ```{r}
 valeur_unique <- unique(data$is_genuine)
 print(valeur_unique)
 ```
+
+Nous avons 2 valeurs uniques dans la colonne is_genuine =\> True ou False
 
 ```{r}
 valeur_compte <- table(data$is_genuine)
 print(valeur_compte)
 ```
 
-```{r}
-install.packages("dplyr")
-```
+Il y a **500 valeurs False** et **1 000 valeurs True**
+
+### En résumé
+
+Nous avons un tableau regroupant les données de 1 500 billets\
+1 colonne décrivant s'il s'agit de vrais ou faux billets :\
+- il y a 1 000 vrais billets et 500 faux billets\
+6 colonne décrivants le format de ces billets :\
+- diagonale\
+- hauteur gauche\
+- hauteur droite\
+- marge basse\
+- marge haute\
+- longueur\
+***37 billets*** n'ont pas l'information de la marge basse dans le tableau.
+
+Nous allons aggréger les données sur la colonnne is_genuine\
+Afficher la valeur moyenne de chaque variable pour les lignes False et True
 
 ```{r}
+if (!require(dplyr)) install.packages("dplyr")
+
 library(dplyr)
 ```
 
@@ -63,5 +94,5 @@ resultats <- data %>%
 print(resultats)
 ```
 
-```{}
+```         
 ```

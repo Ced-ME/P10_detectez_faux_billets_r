@@ -113,24 +113,321 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Après avoir lu en détail le cahier des charges, vous vous préparez à vous rendre à l’ONCFM pour prendre vos nouvelles fonctions. Vous notez tout de même un post-it qui se trouve sur le coin de votre bureau, laissé par un de vos collègues :</p>
 <section id="importation-des-fichiers" class="level2">
 <h2 class="anchored" data-anchor-id="importation-des-fichiers">Importation des fichiers</h2>
-<p>Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <a href="https://quarto.org" class="uri">https://quarto.org</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data_raw/billets.csv"</span>, <span class="at">sep =</span><span class="st">";"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
-<section id="running-code" class="level2">
-<h2 class="anchored" data-anchor-id="running-code">Running Code</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
+<section id="résumé-des-datas" class="level2">
+<h2 class="anchored" data-anchor-id="résumé-des-datas">Résumé des datas</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<pre><code>  is_genuine           diagonal      height_left     height_right  
+ Length:1500        Min.   :171.0   Min.   :103.1   Min.   :102.8  
+ Class :character   1st Qu.:171.8   1st Qu.:103.8   1st Qu.:103.7  
+ Mode  :character   Median :172.0   Median :104.0   Median :103.9  
+                    Mean   :172.0   Mean   :104.0   Mean   :103.9  
+                    3rd Qu.:172.2   3rd Qu.:104.2   3rd Qu.:104.2  
+                    Max.   :173.0   Max.   :104.9   Max.   :105.0  
+                                                                   
+   margin_low      margin_up         length     
+ Min.   :2.980   Min.   :2.270   Min.   :109.5  
+ 1st Qu.:4.015   1st Qu.:2.990   1st Qu.:112.0  
+ Median :4.310   Median :3.140   Median :113.0  
+ Mean   :4.486   Mean   :3.151   Mean   :112.7  
+ 3rd Qu.:4.870   3rd Qu.:3.310   3rd Qu.:113.3  
+ Max.   :6.900   Max.   :3.910   Max.   :114.4  
+ NA's   :37                                     </code></pre>
 </div>
 </div>
-<p>You can add options to executable code like this</p>
+<p>Nous avons un dataframe de 7 colonnes et 1 500 lignes 1 colonne de type character 6 colonnes numériques</p>
+</section>
+<section id="description-des-variables-numériques" class="level2">
+<h2 class="anchored" data-anchor-id="description-des-variables-numériques">Description des variables numériques</h2>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(skimr)) <span class="fu">install.packages</span>(<span class="st">"skimr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Le chargement a nécessité le package : skimr</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">data</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">1500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">is_genuine</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 7%">
+<col style="width: 5%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">diagonal</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">171.96</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">171.04</td>
+<td style="text-align: right;">171.75</td>
+<td style="text-align: right;">171.96</td>
+<td style="text-align: right;">172.17</td>
+<td style="text-align: right;">173.01</td>
+<td style="text-align: left;">▁▅▇▃▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">height_left</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">104.03</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">103.14</td>
+<td style="text-align: right;">103.82</td>
+<td style="text-align: right;">104.04</td>
+<td style="text-align: right;">104.23</td>
+<td style="text-align: right;">104.88</td>
+<td style="text-align: left;">▁▅▇▅▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">height_right</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">103.92</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">102.82</td>
+<td style="text-align: right;">103.71</td>
+<td style="text-align: right;">103.92</td>
+<td style="text-align: right;">104.15</td>
+<td style="text-align: right;">104.95</td>
+<td style="text-align: left;">▁▃▇▅▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">margin_low</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">0.98</td>
+<td style="text-align: right;">4.49</td>
+<td style="text-align: right;">0.66</td>
+<td style="text-align: right;">2.98</td>
+<td style="text-align: right;">4.02</td>
+<td style="text-align: right;">4.31</td>
+<td style="text-align: right;">4.87</td>
+<td style="text-align: right;">6.90</td>
+<td style="text-align: left;">▁▇▃▂▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">margin_up</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">3.15</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">2.27</td>
+<td style="text-align: right;">2.99</td>
+<td style="text-align: right;">3.14</td>
+<td style="text-align: right;">3.31</td>
+<td style="text-align: right;">3.91</td>
+<td style="text-align: left;">▁▂▇▅▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">length</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1.00</td>
+<td style="text-align: right;">112.68</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">109.49</td>
+<td style="text-align: right;">112.03</td>
+<td style="text-align: right;">112.96</td>
+<td style="text-align: right;">113.34</td>
+<td style="text-align: right;">114.44</td>
+<td style="text-align: left;">▁▂▃▇▃</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Nous avons 37 valeurs manquantes dans la colonne margin_low</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>valeur_unique <span class="ot">&lt;-</span> <span class="fu">unique</span>(data<span class="sc">$</span>is_genuine)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(valeur_unique)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 4</code></pre>
+<pre><code>[1] "True"  "False"</code></pre>
 </div>
 </div>
-<p>The <code>echo: false</code> option disables the printing of code (only output is displayed).</p>
+<p>Nous avons 2 valeurs uniques dans la colonne is_genuine =&gt; True ou False</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>valeur_compte <span class="ot">&lt;-</span> <span class="fu">table</span>(data<span class="sc">$</span>is_genuine)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(valeur_compte)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+False  True 
+  500  1000 </code></pre>
+</div>
+</div>
+<p>Il y a 500 valeurs False et 1 000 valeurs True</p>
+<section id="en-résumé" class="level3">
+<h3 class="anchored" data-anchor-id="en-résumé">En résumé</h3>
+<p>Nous avons un tableau regroupant les données de 1 500 billets<br>
+1 colonne décrivant s’il s’agit de vrais ou faux billets :<br>
+- il y a 1 000 vrais billets et 500 faux billets<br>
+6 colonne décrivants le format de ces billets :<br>
+- diagonale<br>
+- hauteur gauche<br>
+- hauteur droite<br>
+- marge basse<br>
+- marge haute<br>
+- longueur<br>
+37 billets n’ont pas l’information de la marge basse dans le tableau.</p>
+<p>Nous allons aggréger les données sur la colonnne is_genuine<br>
+Afficher la valeur moyenne de chaque variable pour les lignes False et True</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(dplyr)) <span class="fu">install.packages</span>(<span class="st">"dplyr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Le chargement a nécessité le package : dplyr</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attachement du package : 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Les objets suivants sont masqués depuis 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Les objets suivants sont masqués depuis 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>resultats <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(is_genuine) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `summarise()`.
+ℹ In argument: `across(where(is.numeric), mean, na.rm = TRUE)`.
+ℹ In group 1: `is_genuine = "False"`.
+Caused by warning:
+! The `...` argument of `across()` is deprecated as of dplyr 1.1.0.
+Supply arguments directly to `.fns` through an anonymous function instead.
+
+  # Previously
+  across(a:b, mean, na.rm = TRUE)
+
+  # Now
+  across(a:b, \(x) mean(x, na.rm = TRUE))</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(resultats)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 7
+  is_genuine diagonal height_left height_right margin_low margin_up length
+  &lt;chr&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;  &lt;dbl&gt;
+1 False          172.        104.         104.       5.22      3.35   112.
+2 True           172.        104.         104.       4.12      3.05   113.</code></pre>
+</div>
+</div>
+<pre><code></code></pre>
+</section>
 </section>
 </section>
 
