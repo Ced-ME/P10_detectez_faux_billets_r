@@ -8,7 +8,7 @@
 
 <meta name="author" content="CME">
 
-<title>Importation des fichiers</title>
+<title>Détecter des faux billets</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -80,7 +80,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Importation des fichiers</h1>
+<h1 class="title">Détecter des faux billets</h1>
 </div>
 
 
@@ -103,14 +103,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="contexte" class="level1">
-<h1>CONTEXTE</h1>
+<section id="contexte" class="level2">
+<h2 class="anchored" data-anchor-id="contexte">Contexte</h2>
 <p>Vous êtes consultant Data Analyst dans une entreprise spécialisée dans la data. Votre entreprise a décroché une prestation en régie au sein de l’<strong>Organisation nationale de lutte contre le faux-monnayage (ONCFM)</strong>.</p>
 <p><img src="img/logo_oncfm.png" class="img-fluid"></p>
 <p>Cette institution a pour objectif de mettre en place des méthodes d’identification des contrefaçons des billets en euros. Ils font donc appel à vous, spécialiste de la data, pour mettre en place une modélisation qui serait capable d’identifier automatiquement les vrais des faux billets. Et ce à partir simplement de certaines dimensions du billet et des éléments qui le composent.</p>
 <p>Voici le <a href="doc/cahier_des_charges.pdf">cahier des charges de l’ONCFM</a> ainsi que le <a href="data_raw/billets.csv">jeu de données</a></p>
 <p>Le client souhaite que vous travailliez directement depuis ses locaux sous la responsabilité de Marie, responsable du projet d’analyse de données à l’ONCFM. Elle vous laissera une grande autonomie pendant votre mission, et vous demande simplement que vous lui présentiez vos résultats une fois la mission terminée. Elle souhaite voir quels sont les traitements et analyses que vous avez réalisés en amont, les différentes pistes explorées pour la construction de l’algorithme, ainsi que le modèle final retenu.</p>
 <p>Après avoir lu en détail le cahier des charges, vous vous préparez à vous rendre à l’ONCFM pour prendre vos nouvelles fonctions. Vous notez tout de même un post-it qui se trouve sur le coin de votre bureau, laissé par un de vos collègues :</p>
+</section>
 <section id="importation-des-fichiers" class="level2">
 <h2 class="anchored" data-anchor-id="importation-des-fichiers">Importation des fichiers</h2>
 <div class="cell">
@@ -142,8 +143,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Nous avons un dataframe de 7 colonnes et 1 500 lignes 1 colonne de type character 6 colonnes numériques</p>
 </section>
-<section id="description-des-variables-numériques" class="level2">
-<h2 class="anchored" data-anchor-id="description-des-variables-numériques">Description des variables numériques</h2>
+<section id="description-des-variables" class="level2">
+<h2 class="anchored" data-anchor-id="description-des-variables">Description des variables</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(skimr)) <span class="fu">install.packages</span>(<span class="st">"skimr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -362,20 +363,23 @@ False  True
   500  1000 </code></pre>
 </div>
 </div>
-<p>Il y a 500 valeurs False et 1 000 valeurs True</p>
+<p>Il y a <strong>500 valeurs False</strong> et <strong>1 000 valeurs True</strong></p>
 <section id="en-résumé" class="level3">
 <h3 class="anchored" data-anchor-id="en-résumé">En résumé</h3>
 <p>Nous avons un tableau regroupant les données de 1 500 billets<br>
-1 colonne décrivant s’il s’agit de vrais ou faux billets :<br>
+</p>
+<p>1 colonne décrivant s’il s’agit de vrais ou faux billets :<br>
 - il y a 1 000 vrais billets et 500 faux billets<br>
-6 colonne décrivants le format de ces billets :<br>
+</p>
+<p>6 colonne décrivants le format de ces billets :<br>
 - diagonale<br>
 - hauteur gauche<br>
 - hauteur droite<br>
 - marge basse<br>
 - marge haute<br>
 - longueur<br>
-37 billets n’ont pas l’information de la marge basse dans le tableau.</p>
+</p>
+<p><strong><em>37 billets</em></strong> n’ont pas l’information de la marge basse dans le tableau.</p>
 <p>Nous allons aggréger les données sur la colonnne is_genuine<br>
 Afficher la valeur moyenne de chaque variable pour les lignes False et True</p>
 <div class="cell">
@@ -426,8 +430,284 @@ Supply arguments directly to `.fns` through an anonymous function instead.
 2 True           172.        104.         104.       4.12      3.05   113.</code></pre>
 </div>
 </div>
-<pre><code></code></pre>
-</section>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Étape 1: Création du modèle de régression linéaire</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Modèle avec toutes les variables disponibles pour prédire margin_low</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(margin_low <span class="sc">~</span> diagonal <span class="sc">+</span> height_left <span class="sc">+</span> height_right <span class="sc">+</span> margin_up <span class="sc">+</span> length, <span class="at">data =</span> data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Étape 2: Prédire les valeurs manquantes</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Créer une copie du dataframe avec les NA</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>data_na <span class="ot">&lt;-</span> data[<span class="fu">is.na</span>(data<span class="sc">$</span>margin_low), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>data_na</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     is_genuine diagonal height_left height_right margin_low margin_up length
+73         True   171.94      103.89       103.45         NA      3.25 112.79
+100        True   171.93      104.07       104.18         NA      3.14 113.08
+152        True   172.07      103.80       104.38         NA      3.02 112.93
+198        True   171.45      103.66       103.80         NA      3.62 113.27
+242        True   171.83      104.14       104.06         NA      3.02 112.36
+252        True   171.80      103.26       102.82         NA      2.95 113.22
+285        True   171.92      103.83       103.76         NA      3.23 113.29
+335        True   171.85      103.70       103.96         NA      3.00 113.36
+411        True   172.56      103.72       103.51         NA      3.12 112.95
+414        True   172.30      103.66       103.50         NA      3.16 112.95
+446        True   172.34      104.42       103.22         NA      3.01 112.97
+482        True   171.81      103.53       103.96         NA      2.71 113.99
+506        True   172.01      103.97       104.05         NA      2.98 113.65
+612        True   171.80      103.68       103.49         NA      3.30 112.84
+655        True   171.97      103.69       103.54         NA      2.70 112.79
+676        True   171.60      103.85       103.91         NA      2.56 113.27
+711        True   172.03      103.97       103.86         NA      3.07 112.65
+740        True   172.07      103.74       103.76         NA      3.09 112.41
+743        True   172.14      104.06       103.96         NA      3.24 113.07
+781        True   172.41      103.95       103.79         NA      3.13 113.41
+799        True   171.96      103.84       103.62         NA      3.01 114.44
+845        True   171.62      104.14       104.49         NA      2.99 113.35
+846        True   172.02      104.21       104.05         NA      2.90 113.62
+872        True   171.37      104.07       103.75         NA      3.07 113.27
+896        True   171.81      103.68       103.80         NA      2.98 113.82
+920        True   171.92      103.68       103.45         NA      2.58 113.68
+946        True   172.09      103.74       103.52         NA      3.02 112.78
+947        True   171.63      103.87       104.66         NA      3.27 112.68
+982        True   172.02      104.23       103.72         NA      2.99 113.37
+1077      False   171.57      104.27       104.44         NA      3.21 111.87
+1122      False   171.40      104.38       104.19         NA      3.17 112.39
+1177      False   171.59      104.05       103.94         NA      3.02 111.29
+1304      False   172.17      104.49       103.76         NA      2.93 111.21
+1316      False   172.08      104.15       104.17         NA      3.40 112.29
+1348      False   171.72      104.46       104.12         NA      3.61 110.31
+1436      False   172.66      104.33       104.41         NA      3.56 111.47
+1439      False   171.90      104.28       104.29         NA      3.24 111.49</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Prédire les valeurs manquantes</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>predicted_values <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, <span class="at">newdata =</span> data_na)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>predicted_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      73      100      152      198      242      252      285      335 
+4.318525 4.393668 4.410457 4.319014 4.650617 3.803308 4.179736 4.127442 
+     411      414      446      482      506      612      655      676 
+4.135034 4.160539 4.177420 3.768554 4.058764 4.298047 4.160607 4.094065 
+     711      740      743      781      799      845      846      872 
+4.439846 4.470650 4.341643 4.080414 3.614306 4.371811 4.093621 4.249629 
+     896      920      946      947      982     1077     1122     1177 
+3.893748 3.746333 4.237415 4.710533 4.137780 5.050277 4.802145 5.067584 
+    1304     1316     1348     1436     1439 
+5.047570 4.778967 5.726993 5.185862 5.140043 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Étape 3: Remplacer les NA par les valeurs prédites</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>margin_low[<span class="fu">is.na</span>(data<span class="sc">$</span>margin_low)] <span class="ot">&lt;-</span> predicted_values</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Voir le résultat</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data<span class="sc">$</span>margin_low)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  2.980   4.020   4.310   4.483   4.870   6.900 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">skim</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Name</td>
+<td style="text-align: left;">data</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Number of rows</td>
+<td style="text-align: left;">1500</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Number of columns</td>
+<td style="text-align: left;">7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">_______________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Column type frequency:</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">character</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">numeric</td>
+<td style="text-align: left;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">________________________</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Group variables</td>
+<td style="text-align: left;">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 13%">
+<col style="width: 19%">
+<col style="width: 5%">
+<col style="width: 5%">
+<col style="width: 8%">
+<col style="width: 12%">
+<col style="width: 15%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">min</th>
+<th style="text-align: right;">max</th>
+<th style="text-align: right;">empty</th>
+<th style="text-align: right;">n_unique</th>
+<th style="text-align: right;">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">is_genuine</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table class="caption-top table table-sm table-striped small">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 10%">
+<col style="width: 15%">
+<col style="width: 7%">
+<col style="width: 5%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">skim_variable</th>
+<th style="text-align: right;">n_missing</th>
+<th style="text-align: right;">complete_rate</th>
+<th style="text-align: right;">mean</th>
+<th style="text-align: right;">sd</th>
+<th style="text-align: right;">p0</th>
+<th style="text-align: right;">p25</th>
+<th style="text-align: right;">p50</th>
+<th style="text-align: right;">p75</th>
+<th style="text-align: right;">p100</th>
+<th style="text-align: left;">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">diagonal</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">171.96</td>
+<td style="text-align: right;">0.31</td>
+<td style="text-align: right;">171.04</td>
+<td style="text-align: right;">171.75</td>
+<td style="text-align: right;">171.96</td>
+<td style="text-align: right;">172.17</td>
+<td style="text-align: right;">173.01</td>
+<td style="text-align: left;">▁▅▇▃▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">height_left</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">104.03</td>
+<td style="text-align: right;">0.30</td>
+<td style="text-align: right;">103.14</td>
+<td style="text-align: right;">103.82</td>
+<td style="text-align: right;">104.04</td>
+<td style="text-align: right;">104.23</td>
+<td style="text-align: right;">104.88</td>
+<td style="text-align: left;">▁▅▇▅▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">height_right</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">103.92</td>
+<td style="text-align: right;">0.33</td>
+<td style="text-align: right;">102.82</td>
+<td style="text-align: right;">103.71</td>
+<td style="text-align: right;">103.92</td>
+<td style="text-align: right;">104.15</td>
+<td style="text-align: right;">104.95</td>
+<td style="text-align: left;">▁▃▇▅▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">margin_low</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">4.48</td>
+<td style="text-align: right;">0.66</td>
+<td style="text-align: right;">2.98</td>
+<td style="text-align: right;">4.02</td>
+<td style="text-align: right;">4.31</td>
+<td style="text-align: right;">4.87</td>
+<td style="text-align: right;">6.90</td>
+<td style="text-align: left;">▁▇▃▂▁</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">margin_up</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3.15</td>
+<td style="text-align: right;">0.23</td>
+<td style="text-align: right;">2.27</td>
+<td style="text-align: right;">2.99</td>
+<td style="text-align: right;">3.14</td>
+<td style="text-align: right;">3.31</td>
+<td style="text-align: right;">3.91</td>
+<td style="text-align: left;">▁▂▇▅▁</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">length</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">112.68</td>
+<td style="text-align: right;">0.87</td>
+<td style="text-align: right;">109.49</td>
+<td style="text-align: right;">112.03</td>
+<td style="text-align: right;">112.96</td>
+<td style="text-align: right;">113.34</td>
+<td style="text-align: right;">114.44</td>
+<td style="text-align: left;">▁▂▃▇▃</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 </section>
 

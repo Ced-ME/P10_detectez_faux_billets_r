@@ -1,11 +1,11 @@
 ---
-title: "Importation des fichiers"
+title: "Détecter des faux billets"
 author: "CME"
 format: html
 editor: visual
 ---
 
-# CONTEXTE
+## Contexte
 
 Vous êtes consultant Data Analyst dans une entreprise spécialisée dans la data. Votre entreprise a décroché une prestation en régie au sein de l’**Organisation nationale de lutte contre le faux-monnayage (ONCFM)**.
 
@@ -32,12 +32,10 @@ summary(data)
 ```
 
 Nous avons un dataframe de 7 colonnes et 1 500 lignes
-
 1 colonne de type character
-
 6 colonnes numériques
 
-## Description des variables numériques
+## Description des variables
 
 ```{r}
 if (!require(skimr)) install.packages("skimr")
@@ -61,13 +59,16 @@ valeur_compte <- table(data$is_genuine)
 print(valeur_compte)
 ```
 
-Il y a **500 valeurs False** et **1 000 valeurs True**
+Il y a **500 valeurs False** et **1 000 valeurs True**  
+
 
 ### En résumé
 
 Nous avons un tableau regroupant les données de 1 500 billets\
+
 1 colonne décrivant s'il s'agit de vrais ou faux billets :\
 - il y a 1 000 vrais billets et 500 faux billets\
+
 6 colonne décrivants le format de ces billets :\
 - diagonale\
 - hauteur gauche\
@@ -75,7 +76,9 @@ Nous avons un tableau regroupant les données de 1 500 billets\
 - marge basse\
 - marge haute\
 - longueur\
+
 ***37 billets*** n'ont pas l'information de la marge basse dans le tableau.
+
 
 Nous allons aggréger les données sur la colonnne is_genuine\
 Afficher la valeur moyenne de chaque variable pour les lignes False et True
@@ -89,10 +92,47 @@ library(dplyr)
 ```{r}
 resultats <- data %>%
   group_by(is_genuine) %>%
-  summarise(across(where(is.numeric), mean, na.rm = TRUE))
+  summarise(across(where(is.numeric), \(x) mean(x, na.rm = TRUE)))
 
 print(resultats)
 ```
 
-```         
+```{r}
+# Étape 1: Création du modèle de régression linéaire
+# Modèle avec toutes les variables disponibles pour prédire margin_low
+model <- lm(margin_low ~ diagonal + height_left + height_right + margin_up + length, data = data)
 ```
+
+```{r}
+# Étape 2: Prédire les valeurs manquantes
+# Créer une copie du dataframe avec les NA
+data_na <- data[is.na(data$margin_low), ]
+```
+
+```{r}
+data_na
+```
+
+```{r}
+# Prédire les valeurs manquantes
+predicted_values <- predict(model, newdata = data_na)
+```
+
+```{r}
+predicted_values
+```
+
+```{r}
+# Étape 3: Remplacer les NA par les valeurs prédites
+data$margin_low[is.na(data$margin_low)] <- predicted_values
+```
+
+```{r}
+# Voir le résultat
+summary(data$margin_low)
+```
+
+```{r}
+skim(data)
+```
+
