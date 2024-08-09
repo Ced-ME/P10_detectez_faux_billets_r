@@ -31,9 +31,7 @@ data <- read.csv("data_raw/billets.csv", sep =";")
 summary(data)
 ```
 
-Nous avons un dataframe de 7 colonnes et 1 500 lignes
-1 colonne de type character
-6 colonnes numériques
+Nous avons un dataframe de 7 colonnes et 1 500 lignes 1 colonne de type character 6 colonnes numériques
 
 ## Description des variables
 
@@ -59,8 +57,7 @@ valeur_compte <- table(data$is_genuine)
 print(valeur_compte)
 ```
 
-Il y a **500 valeurs False** et **1 000 valeurs True**  
-
+Il y a **500 valeurs False** et **1 000 valeurs True**
 
 ### En résumé
 
@@ -79,7 +76,6 @@ Nous avons un tableau regroupant les données de 1 500 billets\
 
 ***37 billets*** n'ont pas l'information de la marge basse dans le tableau.
 
-
 Nous allons aggréger les données sur la colonnne is_genuine\
 Afficher la valeur moyenne de chaque variable pour les lignes False et True
 
@@ -96,6 +92,10 @@ resultats <- data %>%
 
 print(resultats)
 ```
+
+## Remplacement des données manquantes
+
+Régression linéaire
 
 ```{r}
 # Étape 1: Création du modèle de régression linéaire
@@ -136,3 +136,74 @@ summary(data$margin_low)
 skim(data)
 ```
 
+```{r}
+# Obtenir les résidus du modèle
+residus <- residuals(model)
+
+# Résumé des résidus
+summary(residus)
+
+# Visualiser les résidus
+hist(residus, main="Distribution des résidus", xlab="Résidus")
+
+```
+
+```{r}
+# Résumé du modèle de régression linéaire
+summary(model)
+
+```
+
+Ton modèle de régression linéaire a été ajusté avec succès, et voici ce que signifient les résultats :
+
+### 1. **Résidus**
+
+Les résidus montrent la différence entre les valeurs observées et les valeurs prédites par ton modèle.
+
+-   **Min** : -1.47234
+-   **1Q (premier quartile)** : -0.31707
+-   **Median** : -0.04168
+-   **3Q (troisième quartile)** : 0.27353
+-   **Max** : 1.97084
+
+Ces chiffres montrent que la plupart des erreurs de prédiction se situent dans une plage de -1.47 à 1.97, avec une médiane proche de 0, ce qui est un bon signe. La distribution des résidus semble équilibrée, mais tu pourrais vérifier cela avec un histogramme ou un graphique Q-Q pour confirmer.
+
+### 2. **Coefficients**
+
+Les coefficients indiquent l'effet de chaque variable prédictrice sur la variable dépendante `margin_low`, tout en tenant compte des autres variables.
+
+-   **Intercept (22.99484)** : La valeur de `margin_low` lorsque toutes les autres variables sont à 0 (pas toujours significatif dans la pratique, surtout si les valeurs 0 ne sont pas réalistes pour ces variables).
+
+-   **diagonal (-0.11106)** : Une augmentation d'une unité dans `diagonal` est associée à une diminution de `margin_low` de 0.11106 unités, avec une significativité statistique (p-value = 0.00744).
+
+-   **height_left (0.18412)** : Une augmentation d'une unité dans `height_left` est associée à une augmentation de `margin_low` de 0.18412 unités (très significatif avec p-value = 4.13e-05).
+
+-   **height_right (0.25714)** : Une augmentation d'une unité dans `height_right` est associée à une augmentation de `margin_low` de 0.25714 unités (très significatif, p-value = 2.84e-09).
+
+-   **margin_up (0.25619)** : Une augmentation d'une unité dans `margin_up` est associée à une augmentation de `margin_low` de 0.25619 unités (très significatif, p-value = 7.23e-05).
+
+-   **length (-0.40910)** : Une augmentation d'une unité dans `length` est associée à une diminution de `margin_low` de 0.40910 unités (très significatif, p-value \< 2e-16).
+
+### 3. **Signification statistique**
+
+-   Les p-values indiquent que tous les coefficients sont statistiquement significatifs au niveau de 0.05, voire beaucoup plus bas (beaucoup d'étoiles `***`).
+-   **Signif. codes** : Les niveaux de significativité sont indiqués avec `*`, `**`, `***`, etc. Ici, tous les prédicteurs sont très significatifs, sauf l'intercept.
+
+### 4. **Erreur standard résiduelle (Residual Standard Error)**
+
+-   **Residual Standard Error** : 0.4807. C'est l'écart-type des résidus, une mesure de la dispersion des observations autour des prédictions. Cela signifie que, en moyenne, les prédictions de `margin_low` sont à 0.4807 unités des valeurs observées.
+
+### 5. **R-squared et Adjusted R-squared**
+
+-   **Multiple R-squared** : 0.4773. Cela signifie que 47.73% de la variance dans `margin_low` est expliquée par ce modèle.
+-   **Adjusted R-squared** : 0.4755. C'est une version ajustée du R-squared qui pénalise l'ajout de prédicteurs non significatifs. Ici, c'est très proche du R-squared, ce qui est bon signe.
+
+### 6. **F-statistic**
+
+-   **F-statistic** : 266.1 avec un p-value très bas (\< 2.2e-16), indiquant que le modèle dans son ensemble est statistiquement significatif.
+
+### Conclusion
+
+Ton modèle est relativement bon, avec un R-squared autour de 0.4773, ce qui montre une relation modérée entre les variables prédictrices et `margin_low`. Tous les prédicteurs sont statistiquement significatifs, et l'erreur standard résiduelle est relativement basse, ce qui indique que les prédictions ne s'écartent pas trop des valeurs observées.
+
+Cependant, tu pourrais améliorer encore la précision en explorant d'autres modèles, vérifier l'absence de colinéarité entre les prédicteurs, ou en ajoutant d'autres variables si elles sont disponibles. Tu pourrais aussi vérifier les résidus pour t'assurer qu'ils sont normalement distribués et qu'il n'y a pas de problème avec l'homoscédasticité (variance constante des résidus).
