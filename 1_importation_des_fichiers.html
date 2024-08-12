@@ -103,8 +103,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="contexte" class="level2">
-<h2 class="anchored" data-anchor-id="contexte">Contexte</h2>
+<section id="i--contexte" class="level2">
+<h2 class="anchored" data-anchor-id="i--contexte">I- Contexte</h2>
 <p>Vous êtes consultant Data Analyst dans une entreprise spécialisée dans la data. Votre entreprise a décroché une prestation en régie au sein de l’<strong>Organisation nationale de lutte contre le faux-monnayage (ONCFM)</strong>.</p>
 <p><img src="img/logo_oncfm.png" class="img-fluid"></p>
 <p>Cette institution a pour objectif de mettre en place des méthodes d’identification des contrefaçons des billets en euros. Ils font donc appel à vous, spécialiste de la data, pour mettre en place une modélisation qui serait capable d’identifier automatiquement les vrais des faux billets. Et ce à partir simplement de certaines dimensions du billet et des éléments qui le composent.</p>
@@ -112,14 +112,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Le client souhaite que vous travailliez directement depuis ses locaux sous la responsabilité de Marie, responsable du projet d’analyse de données à l’ONCFM. Elle vous laissera une grande autonomie pendant votre mission, et vous demande simplement que vous lui présentiez vos résultats une fois la mission terminée. Elle souhaite voir quels sont les traitements et analyses que vous avez réalisés en amont, les différentes pistes explorées pour la construction de l’algorithme, ainsi que le modèle final retenu.</p>
 <p>Après avoir lu en détail le cahier des charges, vous vous préparez à vous rendre à l’ONCFM pour prendre vos nouvelles fonctions. Vous notez tout de même un post-it qui se trouve sur le coin de votre bureau, laissé par un de vos collègues :</p>
 </section>
-<section id="importation-des-fichiers" class="level2">
-<h2 class="anchored" data-anchor-id="importation-des-fichiers">Importation des fichiers</h2>
+<section id="ii--importation-des-fichiers" class="level2">
+<h2 class="anchored" data-anchor-id="ii--importation-des-fichiers">II- Importation des fichiers</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"data_raw/billets.csv"</span>, <span class="at">sep =</span><span class="st">";"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="résumé-des-datas" class="level2">
-<h2 class="anchored" data-anchor-id="résumé-des-datas">Résumé des datas</h2>
+<section id="iii--résumé-des-datas" class="level2">
+<h2 class="anchored" data-anchor-id="iii--résumé-des-datas">III- Résumé des datas</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -143,8 +143,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>Nous avons un dataframe de 7 colonnes et 1 500 lignes 1 colonne de type character 6 colonnes numériques</p>
 </section>
-<section id="description-des-variables" class="level2">
-<h2 class="anchored" data-anchor-id="description-des-variables">Description des variables</h2>
+<section id="iv--description-des-variables" class="level2">
+<h2 class="anchored" data-anchor-id="iv--description-des-variables">IV- Description des variables</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(skimr)) <span class="fu">install.packages</span>(<span class="st">"skimr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -417,6 +417,11 @@ Attachement du package : 'dplyr'</code></pre>
 2 True           172.        104.         104.       4.12      3.05   113.</code></pre>
 </div>
 </div>
+</section>
+</section>
+<section id="v--remplacement-des-données-manquantes" class="level2">
+<h2 class="anchored" data-anchor-id="v--remplacement-des-données-manquantes">V- Remplacement des données manquantes</h2>
+<p>Régression linéaire</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Étape 1: Création du modèle de régression linéaire</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Modèle avec toutes les variables disponibles pour prédire margin_low</span></span>
@@ -695,6 +700,1784 @@ Attachement du package : 'dplyr'</code></pre>
 </table>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Obtenir les résidus du modèle</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>residus <span class="ot">&lt;-</span> <span class="fu">residuals</span>(model)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Résumé des résidus</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(residus)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+-1.47234 -0.31707 -0.04168  0.00000  0.27353  1.97084 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualiser les résidus</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(residus, <span class="at">main=</span><span class="st">"Distribution des résidus"</span>, <span class="at">xlab=</span><span class="st">"Résidus"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="1_importation_des_fichiers_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Résumé du modèle de régression linéaire</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = margin_low ~ diagonal + height_left + height_right + 
+    margin_up + length, data = data)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.47234 -0.31707 -0.04168  0.27353  1.97084 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  22.99484    9.65555   2.382  0.01737 *  
+diagonal     -0.11106    0.04144  -2.680  0.00744 ** 
+height_left   0.18412    0.04477   4.113 4.13e-05 ***
+height_right  0.25714    0.04301   5.978 2.84e-09 ***
+margin_up     0.25619    0.06437   3.980 7.23e-05 ***
+length       -0.40910    0.01808 -22.627  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4807 on 1457 degrees of freedom
+  (37 observations effacées parce que manquantes)
+Multiple R-squared:  0.4773,    Adjusted R-squared:  0.4755 
+F-statistic: 266.1 on 5 and 1457 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Ton modèle de régression linéaire a été ajusté avec succès, et voici ce que signifient les résultats :</p>
+<section id="résidus" class="level3">
+<h3 class="anchored" data-anchor-id="résidus">1. <strong>Résidus</strong></h3>
+<p>Les résidus montrent la différence entre les valeurs observées et les valeurs prédites par ton modèle.</p>
+<ul>
+<li><strong>Min</strong> : -1.47234</li>
+<li><strong>1Q (premier quartile)</strong> : -0.31707</li>
+<li><strong>Median</strong> : -0.04168</li>
+<li><strong>3Q (troisième quartile)</strong> : 0.27353</li>
+<li><strong>Max</strong> : 1.97084</li>
+</ul>
+<p>Ces chiffres montrent que la plupart des erreurs de prédiction se situent dans une plage de -1.47 à 1.97, avec une médiane proche de 0, ce qui est un bon signe. La distribution des résidus semble équilibrée, mais tu pourrais vérifier cela avec un histogramme ou un graphique Q-Q pour confirmer.</p>
+</section>
+<section id="coefficients" class="level3">
+<h3 class="anchored" data-anchor-id="coefficients">2. <strong>Coefficients</strong></h3>
+<p>Les coefficients indiquent l’effet de chaque variable prédictrice sur la variable dépendante <code>margin_low</code>, tout en tenant compte des autres variables.</p>
+<ul>
+<li><p><strong>Intercept (22.99484)</strong> : La valeur de <code>margin_low</code> lorsque toutes les autres variables sont à 0 (pas toujours significatif dans la pratique, surtout si les valeurs 0 ne sont pas réalistes pour ces variables).</p></li>
+<li><p><strong>diagonal (-0.11106)</strong> : Une augmentation d’une unité dans <code>diagonal</code> est associée à une diminution de <code>margin_low</code> de 0.11106 unités, avec une significativité statistique (p-value = 0.00744).</p></li>
+<li><p><strong>height_left (0.18412)</strong> : Une augmentation d’une unité dans <code>height_left</code> est associée à une augmentation de <code>margin_low</code> de 0.18412 unités (très significatif avec p-value = 4.13e-05).</p></li>
+<li><p><strong>height_right (0.25714)</strong> : Une augmentation d’une unité dans <code>height_right</code> est associée à une augmentation de <code>margin_low</code> de 0.25714 unités (très significatif, p-value = 2.84e-09).</p></li>
+<li><p><strong>margin_up (0.25619)</strong> : Une augmentation d’une unité dans <code>margin_up</code> est associée à une augmentation de <code>margin_low</code> de 0.25619 unités (très significatif, p-value = 7.23e-05).</p></li>
+<li><p><strong>length (-0.40910)</strong> : Une augmentation d’une unité dans <code>length</code> est associée à une diminution de <code>margin_low</code> de 0.40910 unités (très significatif, p-value &lt; 2e-16).</p></li>
+</ul>
+</section>
+<section id="signification-statistique" class="level3">
+<h3 class="anchored" data-anchor-id="signification-statistique">3. <strong>Signification statistique</strong></h3>
+<ul>
+<li>Les p-values indiquent que tous les coefficients sont statistiquement significatifs au niveau de 0.05, voire beaucoup plus bas (beaucoup d’étoiles <code>***</code>).</li>
+<li><strong>Signif. codes</strong> : Les niveaux de significativité sont indiqués avec <code>*</code>, <code>**</code>, <code>***</code>, etc. Ici, tous les prédicteurs sont très significatifs, sauf l’intercept.</li>
+</ul>
+</section>
+<section id="erreur-standard-résiduelle-residual-standard-error" class="level3">
+<h3 class="anchored" data-anchor-id="erreur-standard-résiduelle-residual-standard-error">4. <strong>Erreur standard résiduelle (Residual Standard Error)</strong></h3>
+<ul>
+<li><strong>Residual Standard Error</strong> : 0.4807. C’est l’écart-type des résidus, une mesure de la dispersion des observations autour des prédictions. Cela signifie que, en moyenne, les prédictions de <code>margin_low</code> sont à 0.4807 unités des valeurs observées.</li>
+</ul>
+</section>
+<section id="r-squared-et-adjusted-r-squared" class="level3">
+<h3 class="anchored" data-anchor-id="r-squared-et-adjusted-r-squared">5. <strong>R-squared et Adjusted R-squared</strong></h3>
+<ul>
+<li><strong>Multiple R-squared</strong> : 0.4773. Cela signifie que 47.73% de la variance dans <code>margin_low</code> est expliquée par ce modèle.</li>
+<li><strong>Adjusted R-squared</strong> : 0.4755. C’est une version ajustée du R-squared qui pénalise l’ajout de prédicteurs non significatifs. Ici, c’est très proche du R-squared, ce qui est bon signe.</li>
+</ul>
+</section>
+<section id="f-statistic" class="level3">
+<h3 class="anchored" data-anchor-id="f-statistic">6. <strong>F-statistic</strong></h3>
+<ul>
+<li><strong>F-statistic</strong> : 266.1 avec un p-value très bas (&lt; 2.2e-16), indiquant que le modèle dans son ensemble est statistiquement significatif.</li>
+</ul>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>Ton modèle est relativement bon, avec un R-squared autour de 0.4773, ce qui montre une relation modérée entre les variables prédictrices et <code>margin_low</code>. Tous les prédicteurs sont statistiquement significatifs, et l’erreur standard résiduelle est relativement basse, ce qui indique que les prédictions ne s’écartent pas trop des valeurs observées.</p>
+<p>Cependant, tu pourrais améliorer encore la précision en explorant d’autres modèles, vérifier l’absence de colinéarité entre les prédicteurs, ou en ajoutant d’autres variables si elles sont disponibles. Tu pourrais aussi vérifier les résidus pour t’assurer qu’ils sont normalement distribués et qu’il n’y a pas de problème avec l’homoscédasticité (variance constante des résidus).</p>
+</section>
+</section>
+<section id="vi--acp-et-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="vi--acp-et-clustering">VI- ACP et Clustering</h2>
+<section id="recherche-de-valeurs-aberrantes" class="level3">
+<h3 class="anchored" data-anchor-id="recherche-de-valeurs-aberrantes">1- Recherche de valeurs aberrantes</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Boxplot pour chaque variable numérique</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>data_numeric <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.numeric))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Afficher boxplots</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>))  <span class="co"># Adapter le nombre de graphiques selon le nombre de variables</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (col <span class="cf">in</span> <span class="fu">colnames</span>(data_numeric)) {</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">boxplot</span>(data_numeric[[col]], <span class="at">main =</span> col, <span class="at">ylab =</span> col)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="1_importation_des_fichiers_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Scatter plot entre deux variables</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(data<span class="sc">$</span>diagonal, data<span class="sc">$</span>height_left, <span class="at">main =</span> <span class="st">"Diagonale vs. Hauteur gauche"</span>, <span class="at">xlab =</span> <span class="st">"Diagonale"</span>, <span class="at">ylab =</span> <span class="st">"Hauteur gauche"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="1_importation_des_fichiers_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<section id="a--méthode-iqr" class="level4">
+<h4 class="anchored" data-anchor-id="a--méthode-iqr">a- Méthode IQR</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculer l'IQR pour chaque colonne</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>iqr <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  q3 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="fl">0.75</span>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  q1 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="fl">0.25</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  q3 <span class="sc">-</span> q1</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Détecter les outliers pour chaque colonne</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>outliers <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  q1 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="fl">0.25</span>)</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  q3 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="fl">0.75</span>)</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  iqr_value <span class="ot">&lt;-</span> <span class="fu">iqr</span>(x)</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  lower_bound <span class="ot">&lt;-</span> q1 <span class="sc">-</span> <span class="fl">1.5</span> <span class="sc">*</span> iqr_value</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  upper_bound <span class="ot">&lt;-</span> q3 <span class="sc">+</span> <span class="fl">1.5</span> <span class="sc">*</span> iqr_value</span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  x <span class="sc">&lt;</span> lower_bound <span class="sc">|</span> x <span class="sc">&gt;</span> upper_bound</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Appliquer la fonction pour détecter les outliers</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>outliers_df <span class="ot">&lt;-</span> data_numeric <span class="sc">%&gt;%</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">everything</span>(), <span class="sc">~</span> <span class="fu">outliers</span>(.)))</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Afficher les outliers</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(outliers_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     diagonal height_left height_right margin_low margin_up length
+1       FALSE        TRUE         TRUE      FALSE     FALSE  FALSE
+2       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+3       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+4       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+5       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+6       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+7       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+8       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+9       FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+10      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+11      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+12      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+13      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+14      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+15      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+16      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+17      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+18      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+19      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+20      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+21      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+22      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+23      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+24      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+25      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+26      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+27      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+28      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+29      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+30      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+31      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+32      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+33      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+34      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+35      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+36      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+37      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+38      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+39      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+40      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+41      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+42      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+43      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+44      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+45      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+46      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+47      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+48      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+49      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+50      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+51      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+52      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+53      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+54      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+55      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+56      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+57      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+58      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+59      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+60      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+61      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+62      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+63      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+64      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+65      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+66      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+67      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+68      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+69      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+70      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+71      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+72      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+73      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+74      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+75      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+76      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+77      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+78      FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+79      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+80      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+81      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+82      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+83      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+84      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+85      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+86      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+87      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+88      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+89      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+90      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+91      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+92      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+93      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+94      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+95      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+96      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+97      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+98      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+99      FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+100     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+101     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+102     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+103     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+104     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+105     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+106     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+107     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+108     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+109     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+110     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+111     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+112     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+113     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+114     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+115     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+116     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+117     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+118     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+119     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+120     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+121     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+122     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+123     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+124     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+125     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+126     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+127     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+128     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+129     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+130     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+131     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+132     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+133     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+134     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+135     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+136     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+137     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+138     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+139     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+140     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+141     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+142     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+143     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+144     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+145     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+146     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+147     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+148     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+149     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+150     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+151     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+152     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+153     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+154     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+155     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+156     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+157     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+158     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+159     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+160     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+161     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+162     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+163     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+164     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+165     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+166     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+167     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+168     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+169     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+170     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+171     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+172     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+173     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+174     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+175     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+176     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+177     FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+178     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+179     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+180     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+181     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+182     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+183     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+184     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+185     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+186     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+187     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+188     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+189     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+190     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+191     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+192     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+193     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+194     FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+195     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+196     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+197     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+198     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+199     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+200     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+201     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+202     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+203     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+204     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+205     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+206     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+207     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+208     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+209     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+210     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+211     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+212     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+213     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+214     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+215     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+216     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+217     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+218     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+219     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+220     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+221     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+222     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+223     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+224     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+225     FALSE        TRUE        FALSE      FALSE     FALSE  FALSE
+226     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+227     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+228     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+229     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+230     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+231     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+232     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+233     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+234     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+235     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+236     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+237     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+238     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+239     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+240     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+241     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+242     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+243     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+244     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+245     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+246     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+247     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+248     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+249     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+250     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+251     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+252     FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+253     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+254     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+255     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+256     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+257     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+258     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+259     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+260     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+261     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+262     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+263     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+264     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+265     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+266     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+267     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+268     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+269     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+270     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+271     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+272     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+273     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+274     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+275     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+276     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+277     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+278     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+279     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+280     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+281     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+282     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+283     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+284     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+285     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+286     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+287     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+288     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+289     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+290     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+291     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+292     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+293     FALSE        TRUE        FALSE      FALSE     FALSE  FALSE
+294     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+295     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+296     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+297     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+298     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+299     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+300     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+301     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+302     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+303     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+304     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+305     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+306     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+307     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+308     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+309     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+310     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+311     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+312     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+313     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+314     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+315     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+316     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+317     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+318     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+319     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+320     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+321     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+322     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+323     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+324     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+325     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+326     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+327     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+328     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+329     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+330     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+331     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+332     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+333     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+334     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+335     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+336     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+337     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+338     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+339     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+340     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+341     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+342     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+343     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+344     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+345     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+346     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+347     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+348     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+349     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+350     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+351     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+352     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+353     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+354     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+355     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+356     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+357     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+358     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+359     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+360     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+361     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+362     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+363     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+364     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+365     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+366     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+367     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+368     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+369     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+370     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+371     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+372     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+373     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+374     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+375     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+376     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+377     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+378     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+379     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+380     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+381     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+382     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+383     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+384     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+385     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+386     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+387     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+388     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+389     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+390     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+391     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+392     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+393     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+394     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+395     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+396     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+397     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+398     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+399     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+400     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+401     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+402     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+403     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+404     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+405     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+406     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+407     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+408     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+409     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+410     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+411     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+412     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+413     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+414     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+415     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+416     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+417     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+418     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+419     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+420     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+421     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+422     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+423     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+424     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+425     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+426     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+427     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+428     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+429     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+430     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+431     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+432     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+433     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+434     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+435     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+436     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+437     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+438     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+439     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+440     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+441     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+442     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+443     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+444     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+445     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+446     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+447     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+448     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+449     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+450     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+451     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+452     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+453     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+454     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+455     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+456     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+457     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+458     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+459     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+460     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+461     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+462     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+463     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+464     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+465     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+466     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+467     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+468     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+469     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+470     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+471     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+472     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+473     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+474     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+475     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+476     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+477     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+478     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+479     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+480     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+481     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+482     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+483     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+484     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+485     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+486     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+487     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+488     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+489     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+490     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+491     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+492     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+493     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+494     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+495     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+496     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+497     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+498     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+499     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+500     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+501     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+502     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+503     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+504     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+505     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+506     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+507     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+508     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+509     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+510     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+511     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+512     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+513     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+514     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+515     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+516     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+517     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+518     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+519     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+520     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+521     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+522     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+523     FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+524     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+525     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+526     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+527     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+528     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+529     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+530     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+531     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+532     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+533     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+534     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+535     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+536     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+537     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+538     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+539     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+540     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+541     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+542     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+543     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+544     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+545     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+546     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+547     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+548     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+549     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+550     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+551     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+552     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+553     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+554     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+555     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+556     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+557     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+558     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+559     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+560     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+561     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+562     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+563     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+564     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+565     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+566     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+567     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+568     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+569     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+570     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+571     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+572     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+573     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+574     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+575     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+576     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+577     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+578     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+579     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+580     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+581     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+582     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+583     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+584     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+585     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+586     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+587     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+588     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+589     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+590     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+591     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+592     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+593     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+594     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+595     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+596     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+597     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+598     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+599     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+600     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+601     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+602     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+603     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+604     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+605     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+606     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+607     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+608     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+609     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+610     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+611     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+612     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+613     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+614     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+615     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+616     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+617     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+618     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+619     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+620     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+621     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+622     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+623     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+624     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+625     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+626     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+627     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+628     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+629     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+630     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+631     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+632     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+633     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+634     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+635     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+636     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+637     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+638     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+639     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+640     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+641     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+642     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+643     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+644     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+645     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+646     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+647     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+648     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+649     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+650     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+651     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+652     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+653     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+654     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+655     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+656     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+657     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+658     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+659     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+660     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+661     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+662     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+663     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+664     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+665     FALSE       FALSE        FALSE      FALSE      TRUE  FALSE
+666     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+667     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+668     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+669     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+670     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+671     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+672     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+673     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+674     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+675     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+676     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+677     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+678     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+679     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+680     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+681     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+682     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+683     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+684     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+685     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+686     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+687     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+688     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+689     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+690     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+691     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+692     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+693     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+694     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+695     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+696     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+697     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+698     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+699     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+700     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+701     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+702     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+703     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+704     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+705     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+706     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+707     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+708     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+709     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+710     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+711     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+712     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+713     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+714     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+715     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+716     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+717     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+718     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+719     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+720     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+721     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+722     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+723     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+724     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+725     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+726     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+727     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+728     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+729     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+730      TRUE       FALSE        FALSE      FALSE     FALSE  FALSE
+731     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+732     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+733     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+734     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+735     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+736     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+737     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+738     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+739     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+740     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+741     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+742     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+743     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+744     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+745     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+746     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+747     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+748     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+749     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+750     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+751     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+752     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+753     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+754     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+755     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+756     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+757     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+758     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+759     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+760     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+761     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+762     FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+763     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+764     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+765     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+766     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+767     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+768     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+769     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+770     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+771     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+772     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+773     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+774     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+775     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+776     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+777     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+778     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+779     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+780     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+781     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+782     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+783     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+784     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+785     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+786     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+787     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+788     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+789     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+790     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+791     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+792     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+793     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+794     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+795     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+796     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+797     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+798     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+799     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+800     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+801     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+802     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+803     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+804     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+805     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+806     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+807     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+808     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+809     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+810     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+811     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+812     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+813     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+814     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+815     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+816     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+817     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+818     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+819     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+820     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+821     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+822     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+823     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+824     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+825     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+826     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+827     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+828     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+829      TRUE       FALSE        FALSE      FALSE     FALSE  FALSE
+830     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+831     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+832     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+833     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+834     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+835     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+836     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+837     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+838     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+839     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+840     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+841     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+842     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+843      TRUE       FALSE        FALSE      FALSE     FALSE  FALSE
+844     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+845     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+846     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+847     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+848     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+849     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+850     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+851     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+852     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+853     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+854     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+855     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+856     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+857     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+858     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+859     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+860     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+861     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+862     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+863     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+864     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+865     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+866     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+867     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+868     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+869     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+870     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+871     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+872     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+873     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+874     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+875     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+876     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+877     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+878     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+879     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+880     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+881     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+882     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+883     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+884     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+885     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+886     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+887     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+888     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+889     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+890     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+891     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+892     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+893     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+894     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+895     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+896     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+897     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+898     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+899     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+900     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+901     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+902     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+903     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+904     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+905     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+906     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+907     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+908     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+909     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+910     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+911     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+912     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+913     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+914     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+915     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+916     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+917     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+918     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+919     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+920     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+921     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+922     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+923     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+924     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+925     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+926     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+927     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+928     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+929     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+930     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+931     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+932     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+933     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+934     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+935     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+936     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+937     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+938     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+939     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+940     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+941     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+942     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+943     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+944     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+945     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+946     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+947     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+948     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+949     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+950     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+951     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+952     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+953     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+954     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+955     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+956     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+957     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+958     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+959     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+960     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+961     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+962     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+963     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+964     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+965     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+966     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+967     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+968     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+969     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+970     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+971     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+972     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+973     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+974     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+975     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+976     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+977     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+978     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+979     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+980     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+981     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+982     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+983     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+984     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+985     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+986     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+987     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+988     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+989     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+990     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+991     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+992     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+993     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+994     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+995     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+996     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+997     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+998     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+999     FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1000    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1001    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1002    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1003    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1004    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1005    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1006    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1007    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1008    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1009    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1010    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1011    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1012    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1013    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1014    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1015    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1016    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1017    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1018    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1019    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1020    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1021    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1022    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1023     TRUE       FALSE        FALSE      FALSE     FALSE  FALSE
+1024    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1025    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1026    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1027    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1028    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1029    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1030    FALSE       FALSE        FALSE      FALSE      TRUE  FALSE
+1031    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1032    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1033    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1034    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1035    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1036    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1037    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1038    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1039    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1040    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1041    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1042    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1043    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1044    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1045    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1046    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1047    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1048    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1049    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1050    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1051    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1052    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1053    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1054    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1055    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1056    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1057    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1058    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1059    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1060    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1061    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1062    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1063    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1064    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1065    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1066    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1067    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1068    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1069    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1070    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1071    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1072    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1073    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1074    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1075    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1076    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1077    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1078    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1079    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1080    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1081    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1082    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1083    FALSE       FALSE        FALSE      FALSE     FALSE   TRUE
+1084    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1085    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1086    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1087    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1088    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1089    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1090    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1091    FALSE        TRUE        FALSE      FALSE     FALSE  FALSE
+1092    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1093    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1094    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1095    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1096    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1097    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1098    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1099    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1100    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1101    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1102    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1103    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1104    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1105    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1106    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1107    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1108    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1109    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1110    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1111    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1112    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1113    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1114    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1115    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1116    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1117    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1118    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1119    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1120    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1121    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1122    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1123    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1124    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1125    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1126    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1127    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1128    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1129    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1130    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1131    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1132    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1133    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1134    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1135    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1136    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1137    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1138    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1139    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1140    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1141    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1142    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1143     TRUE       FALSE        FALSE      FALSE     FALSE  FALSE
+1144    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1145    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1146    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1147    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1148    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1149    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1150    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1151    FALSE        TRUE        FALSE      FALSE     FALSE  FALSE
+1152    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1153    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1154    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1155    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1156    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1157    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1158    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1159    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1160    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1161    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1162    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1163    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1164    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1165    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1166    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1167    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1168    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1169    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1170    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1171    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1172    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1173    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1174    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1175    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1176    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1177    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1178    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1179    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1180    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1181    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1182    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1183    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1184    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1185    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1186    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1187    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1188    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1189    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1190    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1191    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1192    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1193    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1194    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1195    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1196    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1197    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1198    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1199    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1200    FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+1201    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1202    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1203    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1204    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1205    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1206    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1207    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1208    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1209    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1210    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1211    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1212    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1213    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1214    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1215    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1216    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1217    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1218    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1219    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1220    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1221    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1222    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1223    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1224    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1225    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1226    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1227    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1228    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1229    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1230    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1231    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1232    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1233    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1234    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1235    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1236    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1237    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1238    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1239    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1240    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1241    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1242    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1243    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1244    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1245    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1246    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1247    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1248    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1249    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1250    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1251    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1252    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1253    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1254    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1255    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1256    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1257    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1258    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1259    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1260    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1261    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1262    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1263    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1264    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1265    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1266    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1267    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1268    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1269    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1270    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1271    FALSE       FALSE        FALSE      FALSE      TRUE  FALSE
+1272    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1273    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1274    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1275    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1276    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1277    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1278     TRUE       FALSE        FALSE      FALSE     FALSE  FALSE
+1279    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1280    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1281    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1282    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1283    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1284    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1285    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1286    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1287    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1288    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1289    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1290    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1291    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1292    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1293    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1294    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1295    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1296    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1297    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1298    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1299    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1300    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1301    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1302    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1303    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1304    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1305    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1306    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1307    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1308    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1309    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1310    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1311    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1312    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1313    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1314    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1315    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1316    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1317    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1318    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1319    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1320    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1321    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1322    FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+1323    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1324    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1325    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1326    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1327    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1328    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1329    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1330    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1331    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1332    FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+1333    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1334    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1335    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1336    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1337    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1338    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1339    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1340    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1341    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1342    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1343    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1344    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1345    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1346    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1347    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1348    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1349    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1350    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1351    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1352    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1353    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1354    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1355    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1356    FALSE       FALSE        FALSE      FALSE     FALSE   TRUE
+1357    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1358    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1359    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1360    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1361    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1362    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1363    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1364    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1365    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1366    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1367    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1368    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1369    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1370    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1371    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1372    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1373    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1374    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1375    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1376    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1377    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1378    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1379    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1380    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1381    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1382    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1383    FALSE        TRUE        FALSE      FALSE     FALSE  FALSE
+1384    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1385    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1386    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1387    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1388    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1389     TRUE       FALSE        FALSE      FALSE     FALSE  FALSE
+1390    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1391    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1392    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1393    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1394    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1395    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1396    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1397    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1398    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1399    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1400    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1401    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1402    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1403    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1404    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1405    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1406    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1407    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1408    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1409    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1410    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1411    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1412    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1413    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1414    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1415    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1416    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1417    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1418    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1419    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1420    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1421    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1422    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1423    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1424    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1425    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1426    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1427    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1428    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1429    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1430    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1431    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1432    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1433    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1434    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1435    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1436    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1437    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1438    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1439    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1440    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1441    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1442    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1443    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1444    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1445    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1446    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1447    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1448    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1449    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1450    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1451    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1452    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1453    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1454    FALSE       FALSE        FALSE      FALSE     FALSE   TRUE
+1455    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1456    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1457    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1458    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1459    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1460    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1461    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1462    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1463    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1464    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1465    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1466    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1467    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1468    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1469    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1470    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1471    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1472    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1473    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1474    FALSE       FALSE        FALSE       TRUE     FALSE  FALSE
+1475    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1476    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1477    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1478    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1479    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1480    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1481    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1482    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1483    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1484    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1485    FALSE       FALSE         TRUE      FALSE     FALSE  FALSE
+1486    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1487    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1488    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1489    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1490    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1491    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1492    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1493    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1494    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1495    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1496    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1497    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1498    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1499    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE
+1500    FALSE       FALSE        FALSE      FALSE     FALSE  FALSE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Afficher les indices des outliers</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>outlier_indices <span class="ot">&lt;-</span> <span class="fu">which</span>(<span class="fu">rowSums</span>(outliers_df) <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(outlier_indices)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]    1   78  177  194  225  252  293  523  665  730  762  829  843 1023 1024
+[16] 1028 1030 1032 1042 1054 1076 1083 1091 1093 1111 1125 1134 1135 1143 1151
+[31] 1170 1200 1255 1271 1278 1291 1322 1323 1332 1346 1349 1354 1356 1383 1389
+[46] 1421 1427 1442 1454 1460 1465 1474 1485</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Afficher les lignes du dataframe original contenant des outliers</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>data_with_outliers <span class="ot">&lt;-</span> data[outlier_indices, ]</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(data_with_outliers)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     is_genuine diagonal height_left height_right margin_low margin_up length
+1          True   171.81      104.86       104.95   4.520000      2.89 112.83
+78         True   171.84      104.09       103.03   4.110000      2.77 113.18
+177        True   171.75      103.63       102.97   4.460000      2.77 113.22
+194        True   172.35      103.73       102.95   4.490000      3.37 112.49
+225        True   172.12      103.20       103.92   4.460000      3.26 113.44
+252        True   171.80      103.26       102.82   3.803308      2.95 113.22
+293        True   172.09      103.14       103.81   4.880000      3.01 113.69
+523        True   172.02      104.42       102.91   3.860000      3.12 113.43
+665        True   172.05      103.70       103.75   5.040000      2.27 113.55
+730        True   171.04      103.84       103.64   4.220000      3.36 112.70
+762        True   172.16      103.93       103.04   4.140000      2.99 113.26
+829        True   172.92      103.55       103.94   4.780000      3.27 113.55
+843        True   172.89      103.77       104.24   4.120000      3.01 113.72
+1023      False   172.89      104.03       104.03   6.030000      3.00 110.95
+1024      False   172.02      104.26       104.20   6.200000      3.58 111.25
+1028      False   171.63      104.02       104.66   6.700000      3.28 111.28
+1030      False   171.96      104.29       104.03   6.010000      3.91 110.83
+1032      False   172.40      104.00       103.82   6.330000      3.10 112.11
+1042      False   171.77      104.12       104.42   6.650000      3.63 111.53
+1054      False   171.85      104.52       104.05   6.210000      3.43 111.96
+1076      False   172.02      104.51       103.69   6.230000      3.39 112.35
+1083      False   171.75      103.96       103.83   5.390000      3.54 109.49
+1091      False   172.11      104.88       104.10   4.800000      3.73 110.78
+1093      False   171.87      104.76       104.02   6.300000      3.61 111.29
+1111      False   171.73      104.32       104.07   6.560000      3.30 112.80
+1125      False   171.88      103.92       104.27   6.700000      3.11 110.93
+1134      False   171.79      103.99       103.67   6.160000      3.52 110.93
+1135      False   171.91      103.70       104.41   6.340000      3.50 113.05
+1143      False   171.04      104.23       104.22   4.870000      3.56 111.54
+1151      False   171.79      104.86       104.34   5.390000      3.14 113.02
+1170      False   171.99      104.14       104.15   6.480000      3.42 112.16
+1200      False   172.03      104.32       104.87   4.490000      3.77 111.04
+1255      False   171.15      104.09       104.30   6.490000      3.20 111.61
+1271      False   171.26      104.22       104.07   4.780000      3.81 112.88
+1278      False   173.01      104.59       104.31   5.040000      3.05 110.91
+1291      False   171.94      104.06       104.22   6.900000      3.36 111.70
+1322      False   172.29      104.72       104.86   5.710000      3.16 112.15
+1323      False   172.07      104.50       104.23   6.190000      3.07 111.21
+1332      False   172.32      104.60       104.83   4.840000      3.51 112.55
+1346      False   171.56      104.17       103.87   6.160000      3.38 111.55
+1349      False   171.84      104.32       104.50   6.280000      3.00 111.06
+1354      False   171.61      104.04       104.06   6.190000      3.08 110.73
+1356      False   171.68      103.89       103.70   5.970000      3.03 109.97
+1383      False   171.97      104.85       104.52   5.870000      3.56 110.98
+1389      False   171.05      104.09       104.50   4.720000      3.10 112.44
+1421      False   171.56      104.47       104.04   6.380000      3.43 112.12
+1427      False   172.22      103.92       104.03   6.250000      3.14 110.89
+1442      False   171.63      104.55       103.81   6.560000      3.10 111.87
+1454      False   171.55      104.20       104.49   5.420000      3.54 109.93
+1460      False   171.78      104.31       103.82   6.190000      3.25 111.14
+1465      False   172.07      104.17       104.37   6.540000      3.54 111.20
+1474      False   171.76      104.04       104.12   6.290000      3.20 112.87
+1485      False   172.08      103.96       104.95   5.220000      3.45 112.07</code></pre>
+</div>
+</div>
+</section>
+<section id="b--méthode-z_score" class="level4">
+<h4 class="anchored" data-anchor-id="b--méthode-z_score">b- Méthode Z_score</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(tidyverse)) <span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Le chargement a nécessité le package : tidyverse</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ forcats   1.0.0     ✔ readr     2.1.5
+✔ ggplot2   3.5.1     ✔ stringr   1.5.1
+✔ lubridate 1.9.3     ✔ tibble    3.2.1
+✔ purrr     1.0.2     ✔ tidyr     1.3.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Charger les bibliothèques nécessaires</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Sélectionner les colonnes numériques et supprimer les lignes avec des valeurs manquantes</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>data_numeric <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="fu">where</span>(is.numeric)) <span class="sc">%&gt;%</span> <span class="fu">drop_na</span>()</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculer les scores Z</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>data_z <span class="ot">&lt;-</span> <span class="fu">scale</span>(data_numeric)</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Vérifier les scores Z</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data_z)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       diagonal height_left height_right  margin_low  margin_up     length
+[1,] -0.4863774   2.7731984   3.16218582  0.05537133 -1.1279488  0.1735932
+[2,] -1.6331847  -2.2357896  -0.79940117 -1.08162671 -0.6965669  0.4715090
+[3,]  2.3970239   1.5042548  -1.29076079 -0.12654835 -0.9122578  0.5517171
+[4,] -1.9608439  -0.3991607   0.06047818 -1.30902632 -0.6102905  0.9527576
+[5,] -0.7485048   0.8363897  -1.41360070 -0.67230742  1.4172048 -0.1586975
+[6,]  0.6931959  -0.9668460   0.49041785 -0.09622841 -0.8691196  0.1506766</code></pre>
+</div>
+</div>
+</section>
 </section>
 </section>
 

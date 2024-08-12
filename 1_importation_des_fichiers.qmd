@@ -5,7 +5,7 @@ format: html
 editor: visual
 ---
 
-## Contexte
+## I- Contexte
 
 Vous êtes consultant Data Analyst dans une entreprise spécialisée dans la data. Votre entreprise a décroché une prestation en régie au sein de l’**Organisation nationale de lutte contre le faux-monnayage (ONCFM)**.
 
@@ -19,13 +19,13 @@ Le client souhaite que vous travailliez directement depuis ses locaux sous la re
 
 Après avoir lu en détail le cahier des charges, vous vous préparez à vous rendre à l’ONCFM pour prendre vos nouvelles fonctions. Vous notez tout de même un post-it qui se trouve sur le coin de votre bureau, laissé par un de vos collègues :
 
-## Importation des fichiers
+## II- Importation des fichiers
 
 ```{r}
 data <- read.csv("data_raw/billets.csv", sep =";")
 ```
 
-## Résumé des datas
+## III- Résumé des datas
 
 ```{r}
 summary(data)
@@ -33,7 +33,7 @@ summary(data)
 
 Nous avons un dataframe de 7 colonnes et 1 500 lignes 1 colonne de type character 6 colonnes numériques
 
-## Description des variables
+## IV- Description des variables
 
 ```{r}
 if (!require(skimr)) install.packages("skimr")
@@ -93,7 +93,7 @@ resultats <- data %>%
 print(resultats)
 ```
 
-## Remplacement des données manquantes
+## V- Remplacement des données manquantes
 
 Régression linéaire
 
@@ -154,11 +154,11 @@ summary(model)
 
 ```
 
-Ton modèle de régression linéaire a été ajusté avec succès, et voici ce que signifient les résultats :
+Le modèle de régression linéaire a été ajusté avec succès, et voici ce que signifient les résultats :
 
 ### 1. **Résidus**
 
-Les résidus montrent la différence entre les valeurs observées et les valeurs prédites par ton modèle.
+Les résidus montrent la différence entre les valeurs observées et les valeurs prédites par le modèle.
 
 -   **Min** : -1.47234
 -   **1Q (premier quartile)** : -0.31707
@@ -166,7 +166,7 @@ Les résidus montrent la différence entre les valeurs observées et les valeurs
 -   **3Q (troisième quartile)** : 0.27353
 -   **Max** : 1.97084
 
-Ces chiffres montrent que la plupart des erreurs de prédiction se situent dans une plage de -1.47 à 1.97, avec une médiane proche de 0, ce qui est un bon signe. La distribution des résidus semble équilibrée, mais tu pourrais vérifier cela avec un histogramme ou un graphique Q-Q pour confirmer.
+Ces chiffres montrent que la plupart des erreurs de prédiction se situent dans une plage de -1.47 à 1.97, avec une médiane proche de 0, ce qui est un bon signe. La distribution des résidus semble équilibrée, on peut vérifier cela avec un histogramme ou un graphique Q-Q pour confirmer.
 
 ### 2. **Coefficients**
 
@@ -204,6 +204,354 @@ Les coefficients indiquent l'effet de chaque variable prédictrice sur la variab
 
 ### Conclusion
 
-Ton modèle est relativement bon, avec un R-squared autour de 0.4773, ce qui montre une relation modérée entre les variables prédictrices et `margin_low`. Tous les prédicteurs sont statistiquement significatifs, et l'erreur standard résiduelle est relativement basse, ce qui indique que les prédictions ne s'écartent pas trop des valeurs observées.
+Le modèle est relativement bon, avec un R-squared autour de 0.4773, ce qui montre une relation modérée entre les variables prédictrices et `margin_low`. Tous les prédicteurs sont statistiquement significatifs, et l'erreur standard résiduelle est relativement basse, ce qui indique que les prédictions ne s'écartent pas trop des valeurs observées.
 
-Cependant, tu pourrais améliorer encore la précision en explorant d'autres modèles, vérifier l'absence de colinéarité entre les prédicteurs, ou en ajoutant d'autres variables si elles sont disponibles. Tu pourrais aussi vérifier les résidus pour t'assurer qu'ils sont normalement distribués et qu'il n'y a pas de problème avec l'homoscédasticité (variance constante des résidus).
+Cependant, on pourrait améliorer encore la précision en explorant d'autres modèles, vérifier l'absence de colinéarité entre les prédicteurs, ou en ajoutant d'autres variables si elles sont disponibles. on pourrait aussi vérifier les résidus pour s'assurer qu'ils sont normalement distribués et qu'il n'y a pas de problème avec l'homoscédasticité (variance constante des résidus).
+
+## VI- ACP et Clustering
+
+### 1- Recherche de valeurs aberrantes
+
+```{r}
+# Boxplot pour chaque variable numérique
+data_numeric <- data %>% select(where(is.numeric))
+
+# Afficher boxplots
+par(mfrow = c(2, 3))  # Adapter le nombre de graphiques selon le nombre de variables
+for (col in colnames(data_numeric)) {
+  boxplot(data_numeric[[col]], main = col, ylab = col)
+}
+
+```
+
+```{r}
+# Scatter plot entre deux variables
+plot(data$diagonal, data$height_left, main = "Diagonale vs. Hauteur gauche", xlab = "Diagonale", ylab = "Hauteur gauche")
+
+```
+
+#### a- Méthode IQR
+
+```{r}
+# Calculer l'IQR pour chaque colonne
+iqr <- function(x) {
+  q3 <- quantile(x, 0.75)
+  q1 <- quantile(x, 0.25)
+  q3 - q1
+}
+
+# Détecter les outliers pour chaque colonne
+outliers <- function(x) {
+  q1 <- quantile(x, 0.25)
+  q3 <- quantile(x, 0.75)
+  iqr_value <- iqr(x)
+  lower_bound <- q1 - 1.5 * iqr_value
+  upper_bound <- q3 + 1.5 * iqr_value
+  x < lower_bound | x > upper_bound
+}
+```
+
+```{r}
+# Appliquer la fonction pour détecter les outliers
+iqr_outliers_data <- data_numeric %>%
+  mutate(across(everything(), ~ outliers(.)))
+
+# Afficher les outliers
+print(iqr_outliers_data)
+```
+
+```{r}
+# Afficher les indices des outliers
+iqr_outliers_indices <- which(rowSums(iqr_outliers_data) > 0)
+print(iqr_outliers_indices)
+```
+
+```{r}
+# Afficher les lignes du dataframe original contenant des outliers
+data_with_iqr_outliers <- data[iqr_outliers_indices, ]
+
+print(data_with_iqr_outliers)
+```
+
+```{r}
+library(dplyr)
+
+# Comptage du nombre de lignes par groupe dans la colonne is_genuine
+iqr_count_by_is_genuine <- data_with_iqr_outliers %>%
+  group_by(is_genuine) %>%
+  summarise(count = n())
+
+# Affichage du résultat
+print(iqr_count_by_is_genuine)
+
+```
+
+Il y a 53 lignes d'outliers avec la méthode IQR\
+40 lignes concernent des faux billets\
+13 lignes concernent de vrais billets
+
+#### b- Méthode Z_score
+
+```{r}
+if (!require(tidyverse)) install.packages("tidyverse")
+
+# Charger les bibliothèques nécessaires
+library(tidyverse)
+
+# Sélectionner les colonnes numériques
+data_numeric <- data %>% select(where(is.numeric))
+
+# Calculer les scores Z
+data_z <- scale(data_numeric)
+
+# Vérifier les scores Z
+head(data_z)
+
+```
+
+```{r}
+summary(data_z)
+```
+
+```{r}
+# Ajouter les scores Z au dataframe original en conservant la colonne de caractères
+data_z_full <- cbind(Row_Index = 1:nrow(data), data %>% select(where(is.character)), as.data.frame(data_z))
+
+# Afficher les premières lignes du nouveau dataframe
+head(data_z_full)
+
+```
+
+```{r}
+# Visualiser la distribution des scores Z pour la colonne 'diagonal'
+ggplot(as.data.frame(data_z), aes(x=diagonal)) + 
+  geom_histogram(binwidth=0.5, fill="blue", color="black") + 
+  theme_minimal() +
+  labs(title="Distribution des scores Z pour la colonne 'diagonal'")
+```
+On fixe à +3 et -3 la limite de z_score pour identifier les outliers
+
+```{r}
+# Identifier les lignes avec des outliers (Z > 3 ou Z < -3)
+z_outliers <- data_z_full %>%
+  filter(apply(data_z, 1, function(row) any(row > 3 | row < -3)))
+
+# Afficher les outliers
+print(z_outliers)
+
+```
+
+```{r}
+library(dplyr)
+
+# Comptage du nombre de lignes par groupe dans la colonne is_genuine
+z_count_by_is_genuine <- z_outliers %>%
+  group_by(is_genuine) %>%
+  summarise(count = n())
+
+# Affichage du résultat
+print(z_count_by_is_genuine)
+
+```
+
+```{r}
+# Extraire les indices des outliers
+z_outliers_indices <- z_outliers$Row_Index
+z_outliers_indices
+```
+
+Il y a 24 lignes d'outliers avec la méthode du Z_score\
+17 lignes concernent des faux billets\
+7 lignes concernent de vrais billets
+
+### 2- Suppression des lignes d'outliers
+
+Je vais commencer mon analyse en supprimant les outliers identifiés par la méthode du Z_Score  
+Je vais donc supprimer 24 lignes du dataframe original "data"  
+je le nommerai "data_without_ouliers_z"  
+
+```{r}
+data_without_ouliers_z <- data[-z_outliers_indices, ]
+data_without_ouliers_z
+```
+
+### 3- ACP
+
+
+```{r}
+if (!require(FactoMineR)) install.packages("FactoMineR")
+if (!require(factoextra)) install.packages("factoextra")
+
+library(FactoMineR)
+library(factoextra)
+```
+
+```{r}
+# Extraire les colonnes numériques
+datanum_without_ouliers_z <- Filter(is.numeric, data_without_ouliers_z)
+```
+
+```{r}
+# Réaliser l'ACP sans spécifier ncp
+resultat_acp <- PCA(datanum_without_ouliers_z, scale.unit = TRUE, graph = FALSE)
+
+# Extraire les valeurs propres
+valeurs_propres <- resultat_acp$eig[,1]
+```
+
+```{r}
+# Calculer les pourcentages d'inertie expliquée par chaque composante
+pourcentage_inertie <- 100 * valeurs_propres / sum(valeurs_propres)
+# Calculer l'inertie cumulée
+cumulative_inertia <- cumsum(pourcentage_inertie)
+```
+
+```{r}
+# Créer un graphique avec un seul appel
+par(mfrow = c(1, 1)) # Assurez-vous d'avoir une seule fenêtre graphique
+
+# Créer un plot avec des barres pour les pourcentages d'inertie
+barplot(pourcentage_inertie, main = "Éboulis des Composantes Principales",
+        xlab = "Composante Principale", ylab = "Pourcentage d'Inertie",
+        col = "lightblue", border = "blue", ylim = c(0, 100))
+
+# Ajouter la courbe cumulée en superposition sur le même graphique
+# Recréer le graphique avec la courbe cumulée en utilisant `plot` pour ne pas effacer les barres
+par(new = TRUE) # Permet de superposer le nouveau graphique sur le précédent
+plot(cumulative_inertia, type = "o", col = "red", pch = 19, 
+     ylim = c(0, 100), xlab = "", ylab = "", axes = FALSE)
+
+# Ajouter une légende
+legend("topright", legend = c("Inertie Cumulée (%)"), col = "red", pch = 19, inset = c(0, 0.5))
+```
+
+
+```{r}
+# on choisit 4 composantes principales qui représentent 80% de la variance
+resultat_acp_optimal <- PCA(datanum_without_ouliers_z, scale.unit = TRUE, ncp = 4, graph = FALSE)
+
+```
+
+```{r}
+# Visualiser les individus et les variables pour les premières et dernières combinaisons de composantes
+pairs_to_plot <- list(c(1, 2), c(3, 4))  # Choisir les paires de composantes à afficher
+
+# Visualiser les individus et les variables pour les différentes combinaisons de composantes
+for (pair in pairs_to_plot) {
+# Visualiser les individus
+  print(fviz_pca_ind(resultat_acp_optimal, 
+                     axes = pair, 
+                     col.ind = "cos2", 
+                     gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"), 
+                     repel = TRUE) +
+        ggtitle(paste("Visualisation des Individus - Composantes", pair[1], "et", pair[2])))
+  
+  # Visualiser les variables
+  print(fviz_pca_var(resultat_acp_optimal, 
+                     axes = pair, 
+                     col.var = "contrib", 
+                     gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07")) +
+        ggtitle(paste("Visualisation des Variables - Composantes", pair[1], "et", pair[2])))
+}
+```
+
+Axes principaux :  
+Dim1 (43.3%) : Cet axe explique 43.3% de la variance totale des données.  
+Dim2 (17%) : Cet axe explique 17% de la variance totale des données.
+
+
+Dim1 On observe :  
+- une forte contribution positibe de la marge basse (margin_low)  
+- une forte contribution négative de la longueur (length)  
+une forte valeur de Dim1 indiquera un longueur de billet faible avec une marge basse élevée  
+
+Dim2 On observe :  
+- une forte contribution positibe de la diagonale
+Une forte valeur de Dim2 indiquera une valeur de diagonale élevée
+
+
+```{r}
+# Extraire les scores des individus
+scores <- resultat_acp_optimal$ind$coord
+
+```
+
+
+```{r}
+head(scores)
+```
+
+```{r}
+# Définir une plage de nombres de clusters à tester
+k_values <- 1:10  # Tester de 1 à 10 clusters
+wss <- numeric(length(k_values))  # Pour stocker la somme des carrés intra-cluster
+
+# Calculer l'inertie pour chaque nombre de clusters
+for (k in k_values) {
+  kmeans_result <- kmeans(scores, centers = k, nstart = 25)  # nstart pour la reproductibilité
+  wss[k] <- kmeans_result$tot.withinss
+}
+
+# Tracer la méthode du coude
+plot(k_values, wss, type = "b", pch = 19, col = "blue", 
+     xlab = "Nombre de Clusters", ylab = "Somme des Carrés Intra-Cluster",
+     main = "Méthode du Coude pour K-means Clustering")
+```
+
+
+```{r}
+# Installer et charger le package factoextra si ce n'est pas déjà fait
+if (!require(factoextra)) install.packages("factoextra")
+library(factoextra)
+
+# Installer et charger le package ggplot2 si ce n'est pas déjà fait
+if (!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+
+# Visualiser les clusters dans les deux premières composantes principales
+plot_clusters <- fviz_cluster(kmeans_result, data = scores,
+                              ellipse.type = "euclid",  # Ajouter des ellipses autour des clusters
+                              ggtheme = theme_minimal()) +
+  ggtitle("Clustering K-means avec 2 Clusters")
+
+# Ajouter les centres des clusters au graphique
+centroids <- kmeans_result$centers
+
+plot_clusters + 
+  geom_point(data = as.data.frame(centroids), aes(x = Dim.1, y = Dim.2), 
+             color = "red", size = 5, shape = 8) +  # Points rouges pour les centres
+  geom_text(data = as.data.frame(centroids), aes(x = Dim.1, y = Dim.2, label = rownames(centroids)),
+            color = "black", vjust = -1, hjust = 1)  # Étiquettes pour les centres
+
+
+```
+
+
+```{r}
+# Centres des clusters
+print(kmeans_result$centers)
+
+```
+```{r}
+# Taille de chaque cluster
+print(kmeans_result$size)
+
+```
+```{r}
+# Ajouter les résultats du clustering à un DataFrame
+data_with_clusters <- data.frame(data_without_ouliers_z, Cluster = kmeans_result$cluster)
+
+# Afficher les premières lignes du DataFrame avec les clusters
+head(data_with_clusters)
+
+```
+
+```{r}
+count_values  <- data_with_clusters %>%
+  group_by(Cluster, is_genuine) %>%
+  count()
+
+print(count_values)
+  
+```
+
