@@ -46,6 +46,14 @@ skim(data)
 Nous avons 37 valeurs manquantes dans la colonne margin_low
 
 ```{r}
+# Afficher les lignes où 'margin_low' est NA
+missing_margin_low <- data[is.na(data$margin_low), ]
+print(missing_margin_low)
+
+```
+
+
+```{r}
 valeur_unique <- unique(data$is_genuine)
 print(valeur_unique)
 ```
@@ -122,400 +130,207 @@ print(resultats)
 
 ## V- Remlacement des NaN de la colonne "margin_low"
 
-### 1- Matrice de dispersion / relation entre les variables
-
-Nous allons créer un 'pairplot' ou matrice de dispersion pour afficher les relations entre les variables avec des nuages de points, des histogrammes et des tendances lissées en tenant compte de la valeur de 'is_genius' 'False' ou 'True'  
-
+Regréssion linéaire multiple
+Nous utilisons toutes les variables pour commencer et nous allons voir si elles sont toutes significatives pour la détermination de "margin_low".
+Si ce n'est pas le cas nous utiliserons la méthode backward et retirerons une à une toutes les variables non significatives.
 
 ```{r}
-if (!require(ggplot2)) install.packages("ggplot2")
-if (!require(GGally)) install.packages("GGally")
+# Supprimer les lignes où 'margin_low' est NaN
+data_without_na <- data[!is.na(data$margin_low), ]
+
+```
+
+```{r}
+reg_multi <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na)
+summary(reg_multi)
+```
+
+Les variables sont toutes significatives car leur p-value est inférieure à 5% (0.05) le niveau de test que nous souhaitons.
+Nous conservons donc toutes les variables pour la détermination de 'margin_low'
+
+Nous pouvons tester le modèle sous forme de prédiction en renseignant toutes les variables pour déterminer une valeur à margin_low
+
+```{r}
+prev <- data.frame(diagonal=169, height_left=105, height_right=105, margin_up=3, length=115)
+marg_low_prev <- predict(reg_multi, prev)
+round(marg_low_prev,digits=2)
+```
+
+```{r}
+#niveau de test
+alpha <- 0.05
+#nombre d'individus
+n <- dim(data_without_na)[1]
+#nombre de variables
+p <- 6
+```
+
+```{r}
+#analyse sur les valeurs atypique ou influantes
+analyses <- data.frame(obs=1:n)
+```
+
+```{r}
+#calcul des leviers
+analyses$levier <- hat(model.matrix(reg_multi))
+seuil_levier <- 2*p/n
+```
+
+```{r}
 library(ggplot2)
-library(GGally)
+ggplot(data=analyses, aes(x=obs,y=levier))+
+  geom_bar(stat='identity', fill="steelblue")+
+  geom_hline(yintercept=seuil_levier, col="red")+
+  theme_minimal()+
+  xlab("Observation")+
+  ylab("Leviers")+
+  scale_x_continuous(breaks=seq(0,n,by=5))
 ```
 
 ```{r}
-# Assurer que 'is_genuine' est un facteur
-data$is_genuine <- as.factor(data$is_genuine)
-
-# Définir les couleurs pour les niveaux de 'is_genuine'
-couleurs <- c("False" = "purple", "True" = "skyblue")
-
-# Créer le pairplot
-ggpairs(data, 
-        aes(color = is_genuine),
-        lower = list(continuous = "points"), # Les graphiques en bas à gauche
-        diag = list(continuous = "barDiag"), # Les graphiques sur la diagonale
-        upper = list(continuous = "smooth")) + # Les graphiques en haut à droite
-  scale_color_manual(values = couleurs) +  # Appliquer la palette de couleurs
-  theme_bw() +                            # Appliquer un thème de fond blanc
-  theme(panel.grid.major = element_line(color = "darkgray"),
-        panel.grid.minor = element_blank()) # Personnaliser les grilles
-
+#pour récupérer les numéros des observations pour lesquels les leviers sont supérieurs au seuil
+idl <- analyses$levier>seuil_levier
+head(idl)
+analyses$levier[idl]
 ```
 
-En regardant la distribution de vrais et faux billets (is_genuine) en fonction des variables,\
-on remarque une plus grande différence de distribution en fonction de la variable "lenght".\
-Cela voudrait dire qu'il y aurait des différences significatives de longueur 'length' entre vrais et faux billets.
-
-Mais il manque des valeurs dans 'margin_low' alors nous allons nous concentrer sur les corrélations qu'il y a entre 'margin_low' et les autres variables.
-
-on voit que 'margin_low' :
-
--   ne semble pas corrélé à 'diagonal',
-
--   semble corrélé positivement à 'height_left', 'height_right', 'margin_up',
-
--   semble corrélé négativement à 'length'.
-
-### 2- Heatmap des relations entre les variables
-
-Nous allons représenter ces corrélations sous forme d'une heatmap
-
+Calculer les résidus studentisés
 ```{r}
-if (!require(reshape2)) install.packages("reshape2")
-if (!require(RColorBrewer)) install.packages("RColorBrewer")
-library(reshape2)
-library(RColorBrewer)
+analyses$rstudent <- rstudent(reg_multi)
+seuil_rstudent <- qt(1-alpha/2,n-p-1)
 ```
 
 ```{r}
-# Calculer la matrice de corrélation
-corr_matrix <- cor(data[c('diagonal', 'height_left', 'height_right', 'margin_low', 'margin_up', 'length')])
-
-# Remodeler la matrice pour ggplot
-melted_corr_matrix <- melt(corr_matrix)
-
-# Créer le heatmap avec ggplot2
-ggplot(data = melted_corr_matrix, aes(x = Var1, y = Var2, fill = value)) +
-  geom_tile(color = "yellow") +
-  geom_text(aes(label = sprintf("%.2f", value)), vjust = 1, color = "black", size = 3) +
-  scale_fill_gradientn(colors = brewer.pal(n = 9, name = "BuPu")) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "Heatmap de la Matrice de Corrélation", x = "", y = "")
+ggplot(data=analyses, aes(x=obs,y=rstudent))+
+  geom_bar(stat='identity', fill="steelblue")+
+  geom_hline(yintercept=-seuil_rstudent, col="red")+
+  geom_hline(yintercept=seuil_rstudent, col="red")+
+  theme_minimal()+
+  xlab("Observation")+
+  ylab("Résidus studentisés")+
+  scale_x_continuous(breaks=seq(0,n,by=5))
 ```
 
-La variable la plus corrélée à 'margin_low' est la variable 'length'.  
-Le coefficient de corrélation est de -0.67, elle est significativement et négativement corrélée à cette variable.
-
-### 3- Nuage de points 'margin_low' vs 'length'
-
-Nous allons créer un nuage de points pour les variables margin_low et length afin de mieux comprendre leur corrélation.
-
+Pour récupérer la distance de Cook
 ```{r}
-# Créer le scatter plot avec ggplot2
-ggplot(data, aes(x = margin_low, y = length, color = is_genuine)) +
-  geom_point() +  # Ajouter les points avec la couleur basée sur is_genuine
-  scale_color_manual(values = c(True = "skyblue", False = "purple")) +  # Définir les couleurs pour TRUE et FALSE
-  labs(title = "Scatter Plot de margin_low vs length",
-       x = "Margin Low",
-       y = "Length",
-       color = "Is Genuine") +  # Ajouter une légende pour la couleur
-  theme_minimal() +                # Utiliser un thème minimaliste
-  theme(axis.text.x = element_text(angle = 45, hjust = 1), # Rotation des labels si nécessaire
-        plot.title = element_text(hjust = 0.5, size = 14, face = "bold")) # Centrer le titre
+influence<-influence.measures(reg_multi)
+names(influence)
+colnames(influence$infmat)
 ```
-On remarque une tendance grace au scatter plot :
-- plus la longueur "length" est faible,  
-- plus la marge basse "margin_low" est haute
-Cela marque également significativement la différence entre vrais et faux billets :
-- les vrais billets ont une longueur élevée et une marge_low faible
-- les faux billets ont une longueur faible et une marge_low élevée.
-
-### 4- Vérification de la corrélation entre 'margin_low' et 'length'
-#### a- Normalité de la distribution ? viualisation Graphique
-##### Histogrammes
-
 ```{r}
-# Histogramme et courbe de densité pour margin_low
-ggplot(data, aes(x = margin_low)) +
-  geom_histogram(aes(y = ..density..), bins = 30, fill = "skyblue", color = "black") +
-  geom_density(color = "red", size = 1) +
-  labs(title = "Histogramme et courbe de densité pour margin_low",
-       x = "Margin Low",
-       y = "Density") +
-  theme_minimal()
-
-# Histogramme et courbe de densité pour length
-ggplot(data, aes(x = length)) +
-  geom_histogram(aes(y = ..density..), bins = 30, fill = "skyblue", color = "black") +
-  geom_density(color = "red", size = 1) +
-  labs(title = "Histogramme et courbe de densité pour length",
-       x = "Length",
-       y = "Density") +
-  theme_minimal()
-
+analyses$dcook <- influence$infmat[,"cook.d"]
+seuil_dcook <- 4/(n-p)
+```
+```{r}
+seuil_dcook
 ```
 
-##### Q-Q plots
+
 
 ```{r}
-# Q-Q Plot pour margin_low
-ggplot(data, aes(sample = margin_low)) +
-  stat_qq() +
-  stat_qq_line(color = "red") +
-  labs(title = "Q-Q Plot pour margin_low",
-       x = "Théorique Quantiles",
-       y = "Quantiles Observés") +
-  theme_minimal()
-
-# Q-Q Plot pour length
-ggplot(data, aes(sample = length)) +
-  stat_qq() +
-  stat_qq_line(color = "red") +
-  labs(title = "Q-Q Plot pour length",
-       x = "Théorique Quantiles",
-       y = "Quantiles Observés") +
-  theme_minimal()
-
+ggplot(data=analyses, aes(x=obs,y=dcook))+
+  geom_bar(stat='identity', fill="steelblue")+
+  geom_hline(yintercept=seuil_dcook, col="red")+
+  theme_minimal()+
+  xlab("Observation")+
+  ylab("Distance de Cook")+
+  scale_x_continuous(breaks=seq(0,n,by=5))
 ```
 
-#### b- Normalité de la distribution ? tests mathématiques
-##### Shapiro-Wilk
-
-H0 : les 2 variables suivent une distribution normale (si p-value > 0.05)
-H1 : les 2 variables ne suivent pas une distribution normale (si p-value < 0.05)
+Recherche de colinéarité (commande VIF)
 
 ```{r}
-# Test de Shapiro-Wilk pour margin_low
-shapiro_test_margin_low <- shapiro.test(data$margin_low)
-print(shapiro_test_margin_low)
+# Installer le package si ce n'est pas déjà fait
+install.packages("car")
 
-# Test de Shapiro-Wilk pour length
-shapiro_test_length <- shapiro.test(data$length)
-print(shapiro_test_length)
-
-```
-
-H0 est rejetée car au moins une des 2 variables ne suit pas une distribution normale avec p-value < 0.05 et proche de 0.
-
-p-value très faible (< 2.2e-16) :
-
-La p-value très inférieure à 0.05 indique que nous rejetons l'hypothèse nulle dans les deux cas. Autrement dit, il est extrêmement improbable que les données suivent une distribution normale.
-
-Statistiques 
-𝑊
-W :
-
-Les statistiques 
-𝑊
-W (0.93752 pour margin_low et 0.9176 pour length) sont inférieures à 1, ce qui suggère que les données s'écartent de la normalité.
-
-Les résultats des tests de Shapiro-Wilk indiquent que ni margin_low ni length ne suivent une distribution normale.
-
-##### Kolmogorov-Smirnov
-
-```{r}
-# Test de Kolmogorov-Smirnov pour margin_low
-ks_test_margin_low <- ks.test(data$margin_low, "pnorm", mean = mean(data$margin_low), sd = sd(data$margin_low))
-print(ks_test_margin_low)
-
-# Test de Kolmogorov-Smirnov pour length
-ks_test_length <- ks.test(data$length, "pnorm", mean = mean(data$length), sd = sd(data$length))
-print(ks_test_length)
-
-```
-
-Statistique 
-𝐷
-D :
-
-La statistique 
-𝐷
-D mesure la plus grande différence entre la distribution empirique des données et la distribution normale théorique. Une statistique 
-𝐷
-D plus grande indique une plus grande déviation de la normalité.
-
-p-value :
-
-La p-value très faible (< 2.2e-16) indique que nous rejetons l'hypothèse nulle selon laquelle les données suivent une distribution normale. Cela suggère que les données de margin_low et length s'écartent significativement d'une distribution normale.
-
-Les résultats du test de Kolmogorov-Smirnov confirment les conclusions des tests de Shapiro-Wilk : les données ne suivent pas une distribution normale.
-
-#### c- Test de corrélation des rangs de Spearman
-
-Dans le cas d'une distribution non gaussienne nous utilisons le coefficient de corrélation des rangs de Spearman pour déterminer mathématiquement s'il y a une corrélation entre 2 variables quantitatives.
-
-```{r}
-# Effectuer le test de corrélation de Spearman entre margin_low et length
-test_spearman <- cor.test(data$margin_low, data$length, method = "spearman")
-
-# Afficher les résultats
-print(test_spearman)
-
-```
-
-### Régréssion linéaire multiple
-#### Vérifier la multicolinéarité avec statistiques VIF (Variance Inflation Factory)
-
-```{r}
-if (!require(car)) install.packages("car")
+# Charger le package
 library(car)
 
-# Préparer les données : retirer les lignes avec des valeurs manquantes
-data_clean <- na.omit(data[, c("margin_low", "diagonal", "height_left", "height_right", "margin_up", "length")])
-
-# Créer le modèle de régression
-model <- lm(margin_low ~ diagonal + height_left + height_right + margin_up + length, data = data_clean)
-
-# Calculer les valeurs VIF
-vif_values <- vif(model)
-
-# Afficher les valeurs VIF
-print(vif_values)
+vif(reg_multi)
 ```
 
-Règles Générales :
+Tous les VIF étant inférieur à 10, il ne semble pas y avoir de problème de colinéarité
 
-VIF < 5 : Pas de multicolinéarité significative.
-5 ≤ VIF < 10 : Multicolinéarité modérée.
-VIF ≥ 10 : Multicolinéarité élevée.
+On peut également tester l'homoscédasticité, c'est à dire la constance de la variance des erreurs
+On peut donc réaliser le test de Breusch-Pagan
 
-Les résultats montrent que la multicolinéarité entre les variables prédictives n'est pas un problème majeur dans le modèle. Les valeurs VIF sont toutes relativement faibles, ce qui est un bon signe pour la stabilité et l'interprétabilité du modèle de régression linéaire.
+```{R}
+install.packages("lmtest")
+library(lmtest)
 
-#### Validation croisée
-
-La validation croisée permet de tester la performance du modèle sur plusieurs sous-ensembles de données pour évaluer sa capacité à généraliser.
-
-```{r}
-if (!require(caret)) install.packages("caret")
-library(caret)
-
-# Définir les contrôles de validation croisée
-train_control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
-
-# Créer le modèle de régression
-model <- train(margin_low ~ diagonal + height_left + height_right + margin_up + length,
-               data = data_clean, 
-               method = "lm", 
-               trControl = train_control)
-
-# Afficher les résultats de la validation croisée
-print(model)
+bptest(reg_multi)
 ```
 
-#### Analyse des Résidus
+La p-valeur est inférieur à 0.05 et proche de 0
+On rejete donc l'hypothèse nul H0
+L'hypothèse nulle de ce test est que les erreurs ont une variance constante, c'est-à-dire que l'hétéroscédasticité n'est pas présente dans les résidus du modèle. En d'autres termes, l'hypothèse nulle affirme que les résidus sont homoscédastiques.
 
-Examine les résidus pour vérifier les hypothèses de la régression linéaire, notamment l'homoscédasticité (variance constante des erreurs) et la normalité des résidus.
+Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante).
+Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
 
-```{r}
-# Créer un modèle de régression
-model <- lm(margin_low ~ diagonal + height_left + height_right + margin_up + length, data = data_clean)
+La p-value obtenue est extrêmement petite (7.76e-16), bien en dessous du seuil de 0,05, qui est généralement utilisé pour les tests statistiques.
 
-# Plot des résidus
-par(mfrow = c(2, 2))  # Afficher plusieurs graphiques dans une grille 2x2
-plot(model)  # Affiche les graphiques des résidus
+il y a des preuves significatives d'hétéroscédasticité dans le modèle de régression.  
+En d'autres termes, la variance des erreurs n'est pas constante et cela peut biaiser les estimations de l'erreur standard des coefficients de régression, ce qui peut à son tour affecter la validité des tests d'hypothèses et des intervalles de confiance.
 
-```
-Les graphiques générés sont :
-
-Residuals vs Fitted: Vérifie si les résidus sont aléatoires.
-Normal Q-Q: Vérifie la normalité des résidus.
-Scale-Location: Vérifie l'homoscédasticité.
-Residuals vs Leverage: Identifie les points influents.
-
-#### Évaluation des Performances
-
-Évalue la performance du modèle en utilisant des métriques telles que le R², l'erreur quadratique moyenne (RMSE) et l'erreur absolue moyenne (MAE).
+Autre point
+Pour tester la normalité des résidus, nous pouvons utiliser le test de shapiro
 
 ```{r}
-# Calculer les prédictions sur les données de validation
-predictions <- predict(model, newdata = data_clean)
-
-# Calculer les métriques de performance
-actuals <- data_clean$margin_low
-rmse <- sqrt(mean((predictions - actuals)^2))
-mae <- mean(abs(predictions - actuals))
-r_squared <- summary(model)$r.squared
-
-# Afficher les résultats
-cat("RMSE:", rmse, "\n")
-cat("MAE:", mae, "\n")
-cat("R-squared:", r_squared, "\n")
-
+shapiro.test(reg_multi$residuals)
 ```
 
-RMSE (Root Mean Square Error) : Le RMSE de 0.4746 obtenu lors de la validation croisée et de 0.4733 sur l'ensemble de test montre que le modèle est cohérent entre l'entraînement et le test.
-MAE (Mean Absolute Error) : Le MAE de 0.3642 lors de la validation croisée et de 0.3597 sur l'ensemble de test indique que les erreurs moyennes absolues sont également faibles, ce qui est un bon signe.
-R² (Coefficient de Détermination) : Un R² d'environ 0.48-0.49 montre que le modèle explique environ 48-49% de la variance des données, ce qui n'est pas exceptionnel, mais peut être satisfaisant en fonction de la complexité du problème.
+L'hypothèse de normalité est remise en cause car la p-value est inférieure à 0.05 et proche de 0
 
-#### Détection des Points Influents
 
-Il est également important d'identifier les points influents qui pourraient avoir un impact disproportionné sur le modèle.
+Nous aurions pu vouloir sélectionner automatiquement un modèle avec l'ensemble des variables
+avec le package stat
+
 
 ```{r}
-# Calculer les valeurs de Cook's distance
-cooks_d <- cooks.distance(model)
-
-# Identifier les points influents
-influential_points <- which(cooks_d > (4 / nrow(data_clean)))
-
-# Afficher les points influents
-cat("Points influents :", influential_points, "\n")
-
+reg_null <- lm(margin_low~1, data=data_without_na)
+reg_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data)
 ```
 
 ```{r}
-# Extraire et afficher les lignes correspondantes dans le dataframe 'data'
-influential_data <- data[influential_points, ]
-print(influential_data)
+#Méthode backward
+reg_backward <- step(reg_tot, direction="backward")
 ```
 
-#### Validation avec un Ensemble de Test
+Le résultat nous montre que toutes les variables explicatives sont importantes dans le modèle pour prédire margin_low.
+la suppression de length à l'impact le plus négatif sur le modèle augmentant considérablement le RSS (somme des carrés des résidus)
+chaque suppression rend le modèle moins performant.
+Le modèle final sera le modèle complet
 
-Si possible, réserve un sous-ensemble de tes données pour tester le modèle après l'entraînement. Cela te permettra de vérifier la performance sur des données non vues.
 
-```{r}
-# Diviser les données en ensembles d'entraînement et de test
-set.seed(123)  # Pour la reproductibilité
-train_index <- createDataPartition(data_clean$margin_low, p = 0.7, list = FALSE)
-train_data <- data_clean[train_index, ]
-test_data <- data_clean[-train_index, ]
 
-# Créer et entraîner le modèle sur les données d'entraînement
-model <- lm(margin_low ~ diagonal + height_left + height_right + margin_up + length, data = train_data)
 
-# Prédictions sur les données de test
-predictions <- predict(model, newdata = test_data)
 
-# Calculer les métriques de performance sur les données de test
-actuals <- test_data$margin_low
-rmse_test <- sqrt(mean((predictions - actuals)^2))
-mae_test <- mean(abs(predictions - actuals))
-r_squared_test <- summary(lm(margin_low ~ diagonal + height_left + height_right + margin_up + length, data = test_data))$r.squared
 
-# Afficher les résultats de la validation sur les données de test
-cat("Test RMSE:", rmse_test, "\n")
-cat("Test MAE:", mae_test, "\n")
-cat("Test R-squared:", r_squared_test, "\n")
 
-```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ANCIENNE PARTIE A REVOIR
 
 ## V- Remplacement des données manquantes
 
-Régression linéaire
-
-```{r}
-# Étape 1: Création du modèle de régression linéaire
-# Modèle avec toutes les variables disponibles pour prédire margin_low
-model <- lm(margin_low ~ diagonal + height_left + height_right + margin_up + length, data = data)
-```
-
-```{r}
-# Étape 2: Prédire les valeurs manquantes
-# Créer une copie du dataframe avec les NA
-data_na <- data[is.na(data$margin_low), ]
-```
-
-```{r}
-data_na
-```
 
 ```{r}
 # Prédire les valeurs manquantes
-predicted_values <- predict(model, newdata = data_na)
+predicted_values <- predict(reg_multi, newdata = missing_margin_low)
 ```
 
 ```{r}
@@ -538,7 +353,7 @@ skim(data)
 
 ```{r}
 # Obtenir les résidus du modèle
-residus <- residuals(model)
+residus <- residuals(reg_multi)
 
 # Résumé des résidus
 summary(residus)
@@ -548,65 +363,7 @@ hist(residus, main="Distribution des résidus", xlab="Résidus")
 
 ```
 
-```{r}
-# Résumé du modèle de régression linéaire
-summary(model)
 
-```
-
-Le modèle de régression linéaire a été ajusté avec succès, et voici ce que signifient les résultats :
-
-### 1. **Résidus**
-
-Les résidus montrent la différence entre les valeurs observées et les valeurs prédites par le modèle.
-
--   **Min** : -1.47234
--   **1Q (premier quartile)** : -0.31707
--   **Median** : -0.04168
--   **3Q (troisième quartile)** : 0.27353
--   **Max** : 1.97084
-
-Ces chiffres montrent que la plupart des erreurs de prédiction se situent dans une plage de -1.47 à 1.97, avec une médiane proche de 0, ce qui est un bon signe. La distribution des résidus semble équilibrée, on peut vérifier cela avec un histogramme ou un graphique Q-Q pour confirmer.
-
-### 2. **Coefficients**
-
-Les coefficients indiquent l'effet de chaque variable prédictrice sur la variable dépendante `margin_low`, tout en tenant compte des autres variables.
-
--   **Intercept (22.99484)** : La valeur de `margin_low` lorsque toutes les autres variables sont à 0 (pas toujours significatif dans la pratique, surtout si les valeurs 0 ne sont pas réalistes pour ces variables).
-
--   **diagonal (-0.11106)** : Une augmentation d'une unité dans `diagonal` est associée à une diminution de `margin_low` de 0.11106 unités, avec une significativité statistique (p-value = 0.00744).
-
--   **height_left (0.18412)** : Une augmentation d'une unité dans `height_left` est associée à une augmentation de `margin_low` de 0.18412 unités (très significatif avec p-value = 4.13e-05).
-
--   **height_right (0.25714)** : Une augmentation d'une unité dans `height_right` est associée à une augmentation de `margin_low` de 0.25714 unités (très significatif, p-value = 2.84e-09).
-
--   **margin_up (0.25619)** : Une augmentation d'une unité dans `margin_up` est associée à une augmentation de `margin_low` de 0.25619 unités (très significatif, p-value = 7.23e-05).
-
--   **length (-0.40910)** : Une augmentation d'une unité dans `length` est associée à une diminution de `margin_low` de 0.40910 unités (très significatif, p-value \< 2e-16).
-
-### 3. **Signification statistique**
-
--   Les p-values indiquent que tous les coefficients sont statistiquement significatifs au niveau de 0.05, voire beaucoup plus bas (beaucoup d'étoiles `***`).
--   **Signif. codes** : Les niveaux de significativité sont indiqués avec `*`, `**`, `***`, etc. Ici, tous les prédicteurs sont très significatifs, sauf l'intercept.
-
-### 4. **Erreur standard résiduelle (Residual Standard Error)**
-
--   **Residual Standard Error** : 0.4807. C'est l'écart-type des résidus, une mesure de la dispersion des observations autour des prédictions. Cela signifie que, en moyenne, les prédictions de `margin_low` sont à 0.4807 unités des valeurs observées.
-
-### 5. **R-squared et Adjusted R-squared**
-
--   **Multiple R-squared** : 0.4773. Cela signifie que 47.73% de la variance dans `margin_low` est expliquée par ce modèle.
--   **Adjusted R-squared** : 0.4755. C'est une version ajustée du R-squared qui pénalise l'ajout de prédicteurs non significatifs. Ici, c'est très proche du R-squared, ce qui est bon signe.
-
-### 6. **F-statistic**
-
--   **F-statistic** : 266.1 avec un p-value très bas (\< 2.2e-16), indiquant que le modèle dans son ensemble est statistiquement significatif.
-
-### Conclusion
-
-Le modèle est relativement bon, avec un R-squared autour de 0.4773, ce qui montre une relation modérée entre les variables prédictrices et `margin_low`. Tous les prédicteurs sont statistiquement significatifs, et l'erreur standard résiduelle est relativement basse, ce qui indique que les prédictions ne s'écartent pas trop des valeurs observées.
-
-Cependant, on pourrait améliorer encore la précision en explorant d'autres modèles, vérifier l'absence de colinéarité entre les prédicteurs, ou en ajoutant d'autres variables si elles sont disponibles. on pourrait aussi vérifier les résidus pour s'assurer qu'ils sont normalement distribués et qu'il n'y a pas de problème avec l'homoscédasticité (variance constante des résidus).
 
 ## VI- ACP et Clustering
 
