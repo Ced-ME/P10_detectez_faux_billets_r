@@ -52,7 +52,6 @@ print(missing_margin_low)
 
 ```
 
-
 ```{r}
 valeur_unique <- unique(data$is_genuine)
 print(valeur_unique)
@@ -112,7 +111,7 @@ Nous avons un tableau regroupant les données de 1 500 billets\
 ***37 billets*** n'ont pas l'information de la marge basse dans le tableau.
 
 Nous allons aggréger les données sur la colonnne is_genuine\
-Afficher la valeur moyenne de chaque variable pour les lignes False et True
+Afficher la valeur moyenne de chaque variable pour les lignes False et True afin de voir si nous pouvons observer des différences significatives sur une ou plusieurs variables.
 
 ```{r}
 if (!require(dplyr)) install.packages("dplyr")
@@ -128,11 +127,19 @@ resultats <- data %>%
 print(resultats)
 ```
 
+Il y a bien quelques différences de mesures entre les vrais et faux billets mais il est difficile d'utiliser ces moyennes pour notre objectif final qui sera de déterminer d'après les mesures de billets s'il s'agit de "vrais" ou de "faux".
+
 ## V- Remlacement des NaN de la colonne "margin_low"
 
-Regréssion linéaire multiple
+Pour commencer il est nécessaire de traiter les valeurs manquantes de notre jeu de données.
+
+Nous avons la possibilité de retirer ces 37 lignes ou bien de déterminer les valeurs manquantes de la colonne "margin_low" en fonction des autres variables présentes à l'aide d'une régréssion linéaire.
+
+Regréssion linéaire multiple :
 Nous utilisons toutes les variables pour commencer et nous allons voir si elles sont toutes significatives pour la détermination de "margin_low".
-Si ce n'est pas le cas nous utiliserons la méthode backward et retirerons une à une toutes les variables non significatives.
+Nous fixons notre seuil de test à 5%
+Toutes les p-valeur inférieure à 0.05 seront donc considérée comme significatives.
+Si toutes les variables ne sont pas significatives, nous utiliserons la méthode backward et retirerons une à une toutes les variables non significatives.
 
 ```{r}
 # Supprimer les lignes où 'margin_low' est NaN
@@ -145,8 +152,7 @@ reg_multi <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, d
 summary(reg_multi)
 ```
 
-Les variables sont toutes significatives car leur p-value est inférieure à 5% (0.05) le niveau de test que nous souhaitons.
-Nous conservons donc toutes les variables pour la détermination de 'margin_low'
+Les variables sont toutes significatives car leur p-value est inférieure à 5% (0.05) le niveau de test que nous souhaitons. Nous conservons donc toutes les variables pour la détermination de 'margin_low'
 
 Nous pouvons tester le modèle sous forme de prédiction en renseignant toutes les variables pour déterminer une valeur à margin_low
 
@@ -195,6 +201,7 @@ analyses$levier[idl]
 ```
 
 Calculer les résidus studentisés
+
 ```{r}
 analyses$rstudent <- rstudent(reg_multi)
 seuil_rstudent <- qt(1-alpha/2,n-p-1)
@@ -212,20 +219,21 @@ ggplot(data=analyses, aes(x=obs,y=rstudent))+
 ```
 
 Pour récupérer la distance de Cook
+
 ```{r}
 influence<-influence.measures(reg_multi)
 names(influence)
 colnames(influence$infmat)
 ```
+
 ```{r}
 analyses$dcook <- influence$infmat[,"cook.d"]
 seuil_dcook <- 4/(n-p)
 ```
+
 ```{r}
 seuil_dcook
 ```
-
-
 
 ```{r}
 ggplot(data=analyses, aes(x=obs,y=dcook))+
@@ -240,7 +248,7 @@ ggplot(data=analyses, aes(x=obs,y=dcook))+
 Recherche de colinéarité (commande VIF)
 
 ```{r}
-# Installer le package si ce n'est pas déjà fait
+# Installation du package
 install.packages("car")
 
 # Charger le package
@@ -251,8 +259,7 @@ vif(reg_multi)
 
 Tous les VIF étant inférieur à 10, il ne semble pas y avoir de problème de colinéarité
 
-On peut également tester l'homoscédasticité, c'est à dire la constance de la variance des erreurs
-On peut donc réaliser le test de Breusch-Pagan
+On peut également tester l'homoscédasticité, c'est à dire la constance de la variance des erreurs On peut donc réaliser le test de Breusch-Pagan
 
 ```{R}
 install.packages("lmtest")
@@ -261,20 +268,19 @@ library(lmtest)
 bptest(reg_multi)
 ```
 
-La p-valeur est inférieur à 0.05 et proche de 0
-On rejete donc l'hypothèse nul H0
-L'hypothèse nulle de ce test est que les erreurs ont une variance constante, c'est-à-dire que l'hétéroscédasticité n'est pas présente dans les résidus du modèle. En d'autres termes, l'hypothèse nulle affirme que les résidus sont homoscédastiques.
+La p-valeur est inférieur à 0.05 et proche de 0 On rejete donc l'hypothèse nulle H0.  
+L'hypothèse nulle de ce test est que les erreurs ont une variance constante, c'est-à-dire que l'hétéroscédasticité n'est pas présente dans les résidus du modèle.  
+En d'autres termes, l'hypothèse nulle affirme que les résidus sont homoscédastiques.
 
-Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante).
+Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante).  
 Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
 
 La p-value obtenue est extrêmement petite (7.76e-16), bien en dessous du seuil de 0,05, qui est généralement utilisé pour les tests statistiques.
 
-il y a des preuves significatives d'hétéroscédasticité dans le modèle de régression.  
+il y a des preuves significatives d'hétéroscédasticité dans le modèle de régression.\
 En d'autres termes, la variance des erreurs n'est pas constante et cela peut biaiser les estimations de l'erreur standard des coefficients de régression, ce qui peut à son tour affecter la validité des tests d'hypothèses et des intervalles de confiance.
 
-Autre point
-Pour tester la normalité des résidus, nous pouvons utiliser le test de shapiro
+Autre point Pour tester la normalité des résidus, nous pouvons utiliser le test de shapiro
 
 ```{r}
 shapiro.test(reg_multi$residuals)
@@ -282,10 +288,7 @@ shapiro.test(reg_multi$residuals)
 
 L'hypothèse de normalité est remise en cause car la p-value est inférieure à 0.05 et proche de 0
 
-
-Nous aurions pu vouloir sélectionner automatiquement un modèle avec l'ensemble des variables
-avec le package stat
-
+Nous aurions pu vouloir sélectionner automatiquement un modèle avec l'ensemble des variables avec le package stat
 
 ```{r}
 reg_null <- lm(margin_low~1, data=data_without_na)
@@ -297,36 +300,11 @@ reg_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, dat
 reg_backward <- step(reg_tot, direction="backward")
 ```
 
-Le résultat nous montre que toutes les variables explicatives sont importantes dans le modèle pour prédire margin_low.
-la suppression de length à l'impact le plus négatif sur le modèle augmentant considérablement le RSS (somme des carrés des résidus)
-chaque suppression rend le modèle moins performant.
-Le modèle final sera le modèle complet
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Le résultat nous montre que toutes les variables explicatives sont importantes dans le modèle pour prédire margin_low. la suppression de length à l'impact le plus négatif sur le modèle augmentant considérablement le RSS (somme des carrés des résidus) chaque suppression rend le modèle moins performant. Le modèle final sera le modèle complet
 
 ANCIENNE PARTIE A REVOIR
 
 ## V- Remplacement des données manquantes
-
 
 ```{r}
 # Prédire les valeurs manquantes
@@ -346,6 +324,18 @@ data$margin_low[is.na(data$margin_low)] <- predicted_values
 # Voir le résultat
 summary(data$margin_low)
 ```
+```{r}
+missing_margin_low
+```
+On contrôle ici que les valeurs déterminées par le modèle ont bien remplacées les NA de notre jeu de donnée "data"
+
+```{r}
+indices <- rownames(missing_margin_low)
+lignes_data <- data[indices, ]
+print(lignes_data)
+
+```
+
 
 ```{r}
 skim(data)
@@ -363,6 +353,7 @@ hist(residus, main="Distribution des résidus", xlab="Résidus")
 
 ```
 
+____________________________________________________________________________________
 
 
 ## VI- ACP et Clustering
@@ -489,6 +480,8 @@ ggplot(as.data.frame(data_z), aes(x=diagonal)) +
 
 On fixe à +3 et -3 la limite de z_score pour identifier les outliers
 
+Puis on affiche les lignes pour lesquels il y a au moins une variables considérée comme outlier
+
 ```{r}
 # Identifier les lignes avec des outliers (Z > 3 ou Z < -3)
 z_outliers <- data_z_full %>%
@@ -499,23 +492,18 @@ print(z_outliers)
 
 ```
 ```{r}
-data_bis <- data
-# Ajouter une colonne Row_index basée sur l'index de ligne
-data_bis$Row_Index <- 1:nrow(data_bis)
-
-```
-
-
-```{r}
-data_bis
+# Afficher les indices des outliers
+z_outliers_indices <- z_outliers$Row_Index
+print(z_outliers_indices)
 ```
 
 ```{r}
-# Fusionner z_outliers avec la colonne is_genuine de data en utilisant Row_index
-z_outliers <- merge(z_outliers, data_bis[, c("Row_Index", "is_genuine")], by = "Row_Index")
+# Afficher les lignes du dataframe original contenant des outliers avec le méthode du z-score
+data_with_z_outliers <- data[z_outliers_indices, ]
 
-z_outliers
+print(data_with_z_outliers)
 ```
+
 
 ```{r}
 library(dplyr)
@@ -530,15 +518,11 @@ print(z_count_by_is_genuine)
 
 ```
 
-```{r}
-# Extraire les indices des outliers
-z_outliers_indices <- z_outliers$Row_Index
-z_outliers_indices
-```
 
 Il y a 24 lignes d'outliers avec la méthode du Z_score\
 17 lignes concernent des faux billets\
 7 lignes concernent de vrais billets
+
 
 ### 2- Suppression des lignes d'outliers
 
@@ -630,8 +614,8 @@ for (pair in pairs_to_plot) {
 ```
 
 Axes principaux :\
-Dim1 (45.9%) : Cet axe explique 45.9% de la variance totale des données.\
-Dim2 (14.6%) : Cet axe explique 14.6% de la variance totale des données.
+Dim1 (43.3%) : Cet axe explique 43.3% de la variance totale des données.\
+Dim2 (17%) : Cet axe explique 17% de la variance totale des données.
 
 Dim1 On observe :\
 - une forte contribution positibe de la marge basse (margin_low)\
@@ -669,6 +653,7 @@ plot(k_values, wss, type = "b", pch = 19, col = "blue",
      xlab = "Nombre de Clusters", ylab = "Somme des Carrés Intra-Cluster",
      main = "Méthode du Coude pour K-means Clustering")
 ```
+TEST AVEC 2 CLUSTERS
 
 ```{r}
 # Appliquer K-means clustering avec 2 clusters
@@ -688,18 +673,24 @@ library(ggplot2)
 # Visualiser les clusters dans les deux premières composantes principales
 plot_clusters <- fviz_cluster(kmeans_result, data = scores,
                               ellipse.type = "euclid",  # Ajouter des ellipses autour des clusters
-                              ggtheme = theme_minimal()) +
+                              ggtheme = theme_minimal())
+
+# Modifier les étiquettes des axes pour refléter la variance expliquée
+plot_clusters <- plot_clusters + 
+  labs(x = "Dim.1 (43.3% de variance)", y = "Dim.2 (17% de variance)") +
   ggtitle("Clustering K-means avec 2 Clusters")
 
 # Ajouter les centres des clusters au graphique
 centroids <- kmeans_result$centers
 
-plot_clusters + 
+plot_clusters <- plot_clusters + 
   geom_point(data = as.data.frame(centroids), aes(x = Dim.1, y = Dim.2), 
              color = "red", size = 5, shape = 8) +  # Points rouges pour les centres
   geom_text(data = as.data.frame(centroids), aes(x = Dim.1, y = Dim.2, label = rownames(centroids)),
             color = "black", vjust = -1, hjust = 1)  # Étiquettes pour les centres
 
+# Afficher le graphique final
+print(plot_clusters)
 
 ```
 
@@ -732,3 +723,260 @@ count_values  <- data_with_clusters %>%
 print(count_values)
   
 ```
+
+TEST AVEC 3 CLUSTERS
+
+```{r}
+# Appliquer K-means clustering avec 3 clusters
+kmeans_result_2 <- kmeans(scores, centers = 3, nstart = 33)  # nstart pour la reproductibilité
+
+```
+
+```{r}
+# Installer et charger le package factoextra si ce n'est pas déjà fait
+if (!require(factoextra)) install.packages("factoextra")
+library(factoextra)
+
+# Installer et charger le package ggplot2 si ce n'est pas déjà fait
+if (!require(ggplot2)) install.packages("ggplot2")
+library(ggplot2)
+
+# Visualiser les clusters dans les deux premières composantes principales
+plot_clusters_2 <- fviz_cluster(kmeans_result_2, data = scores,
+                              ellipse.type = "euclid",  # Ajouter des ellipses autour des clusters
+                              ggtheme = theme_minimal())
+
+# Modifier les étiquettes des axes pour refléter la variance expliquée
+plot_clusters_2 <- plot_clusters_2 + 
+  labs(x = "Dim.1 (43.3% de variance)", y = "Dim.2 (17% de variance)") +
+  ggtitle("Clustering K-means avec 3 Clusters")
+
+# Ajouter les centres des clusters au graphique
+centroids_2 <- kmeans_result_2$centers
+
+plot_clusters_2 <- plot_clusters_2 + 
+  geom_point(data = as.data.frame(centroids_2), aes(x = Dim.1, y = Dim.2), 
+             color = "red", size = 5, shape = 8) +  # Points rouges pour les centres
+  geom_text(data = as.data.frame(centroids_2), aes(x = Dim.1, y = Dim.2, label = rownames(centroids_2)),
+            color = "black", vjust = -1, hjust = 1)  # Étiquettes pour les centres
+
+# Afficher le graphique final
+print(plot_clusters_2)
+
+```
+
+```{r}
+# Centres des clusters
+print(kmeans_result_2$centers)
+
+```
+
+```{r}
+# Taille de chaque cluster
+print(kmeans_result_2$size)
+
+```
+
+```{r}
+# Ajouter les résultats du clustering à un DataFrame
+data_with_clusters_2 <- data.frame(data_without_ouliers_z, Cluster = kmeans_result_2$cluster)
+
+# Afficher les premières lignes du DataFrame avec les clusters
+head(data_with_clusters_2)
+
+```
+
+```{r}
+count_values  <- data_with_clusters_2 %>%
+  group_by(Cluster, is_genuine) %>%
+  count()
+
+print(count_values)
+  
+```
+
+Le but était de vérifier comment se comportait le modèle avec 3 clusters.
+L'idéal aurait été un clustering avec 100 % de vrai dans un cluster
+100 % de faux dans un autre cluster
+et les douteux dans un 3ème cluster
+
+## VII- Régression Logistique
+
+### 1- Remplacement des valeurs de "is_genuine" par "0" et "1"
+
+Nous allons commencer par remplacer "False" par "0" et "True" par "1" afin que "is_genuine" contienne des valeurs numériques binaires.
+
+```{r}
+# Convertir 'is_genuine' en binaire : True -> 1 et False -> 0
+data$is_genuine <- ifelse(data$is_genuine == "True", 1, 0)
+
+# Vérifiez les premiers enregistrements pour confirmer la transformation
+head(data$is_genuine)
+
+```
+
+### 2- Régréssion logistique complète (toutes les variables)
+
+```{r}
+reg_log <- glm(is_genuine~diagonal+height_left+height_right+margin_low+margin_up+length,
+family="binomial",data=data)
+summary(reg_log)
+```
+
+Certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil.
+
+On peut donc passer sur une procédure de sélection en retirant les variables non significatives au fur et à mesure, mais nous pouvons aussi sélectionner automatiquement un modèle avec une commande telle que stepAIC  , qui sélectionne de manière automatique un modèle en se basant sur le critère AIC.
+
+### 3- Sélection du modèle (méthode AIC)
+
+```{r}
+library(MASS)
+stepAIC(reg_log)
+```
+
+La procédure de sélection de modèle nous a permis de déterminer que les variables "diagonal" et "height_left" n'étaient pas nécessaires pour le modèle final. Les variables restantes ("height_right", "margin_low", "margin_up", et "length") sont significatives et ont un impact important sur le modèle.  
+Nous avons réussi à réduire l'AIC, indiquant que le modèle final est plus parcimonieux tout en conservant une bonne qualité d'ajustement.
+
+### 4- Evaluation des performances du modèle
+
+#### a- Métrique de performance
+
+##### Matrice de confusion
+
+La matrice de confusion vous permet de comparer les prédictions du modèle avec les valeurs réelles.
+
+```{r}
+# Prédictions du modèle
+predictions <- predict(reg_log, type = "response")
+
+# Convertir les probabilités en classes (0 ou 1) en utilisant un seuil de 0.5
+predicted_classes <- ifelse(predictions > 0.5, 1, 0)
+
+# Créer la matrice de confusion
+confusion_matrix <- table(Predicted = predicted_classes, Actual = data$is_genuine)
+print(confusion_matrix)
+
+```
+Vrais Négatifs (VN) : 491
+Faux Négatifs (FN) : 4
+Faux Positifs (FP) : 9
+Vrais Positifs (VP) : 996
+
+La matrice de confusion montre que votre modèle a une très bonne performance en classant les cas True et False correctement avec peu d'erreurs.
+
+
+##### Mesures de performance
+
+Précision : Proportion des prédictions correctes parmi toutes les prédictions.
+Sensibilité (Recall) : Proportion des vrais positifs parmi tous les cas positifs réels.
+Spécificité : Proportion des vrais négatifs parmi tous les cas négatifs réels.
+F1-Score : Moyenne harmonique de la précision et de la sensibilité.
+
+```{r}
+# Calculer les mesures de performance
+precision <- confusion_matrix[2, 2] / (confusion_matrix[2, 2] + confusion_matrix[1, 2])
+recall <- confusion_matrix[2, 2] / (confusion_matrix[2, 2] + confusion_matrix[2, 1])
+specificity <- confusion_matrix[1, 1] / (confusion_matrix[1, 1] + confusion_matrix[1, 2])
+f1_score <- 2 * (precision * recall) / (precision + recall)
+
+# Afficher les résultats
+cat("Précision: ", precision, "\n")
+cat("Sensibilité (Recall): ", recall, "\n")
+cat("Spécificité: ", specificity, "\n")
+cat("F1-Score: ", f1_score, "\n")
+
+```
+Précision (Precision) : 0.996
+Cela signifie que parmi toutes les instances que le modèle a classées comme True, 99.6% sont effectivement True. C'est un excellent résultat, indiquant que le modèle est très précis dans ses prédictions positives.
+
+Sensibilité (Recall) : 0.991
+La sensibilité mesure la proportion des véritables True correctement identifiés par le modèle. Avec une sensibilité de 99.1%, votre modèle détecte presque tous les cas positifs.
+
+Spécificité : 0.992
+La spécificité mesure la proportion des véritables False correctement identifiés par le modèle. Avec une spécificité de 99.2%, le modèle est aussi très efficace pour identifier les cas négatifs.
+
+F1-Score : 0.994
+L'F1-Score est la moyenne harmonique de la précision et du rappel. Un F1-Score de 99.4% indique un excellent équilibre entre précision et rappel.
+
+
+##### Courbe ROC et AUC
+
+La courbe ROC (Receiver Operating Characteristic) est utile pour visualiser la performance du modèle à différents seuils de classification. L'AUC (Area Under the Curve) mesure la capacité globale du modèle à discriminer entre les classes.
+
+```{r}
+# Installer et charger le package pROC si ce n'est pas déjà fait
+if (!require(pROC)) install.packages("pROC")
+library(pROC)
+
+# Calculer la courbe ROC
+roc_curve <- roc(data$is_genuine, predictions)
+
+# Tracer la courbe ROC
+plot(roc_curve, main = "Courbe ROC")
+
+# Calculer l'AUC
+auc_value <- auc(roc_curve)
+cat("AUC: ", auc_value, "\n")
+
+```
+AUC : 0.998894
+L'AUC mesure la capacité globale du modèle à discriminer entre les classes. Une AUC proche de 1 (votre AUC est 99.9%) indique que le modèle a une très bonne performance de classification, capable de distinguer presque parfaitement entre les classes True et False.
+
+
+#### b- Validation croisée K-Fold :
+
+La validation croisée K-Fold permet de tester la robustesse du modèle en le validant sur différentes sous-parties du dataset.
+
+```{r}
+# Installer et charger le package cvms si ce n'est pas déjà fait
+if (!require(cvms)) install.packages("cvms")
+if (!require(caret)) install.packages("caret")
+library(cvms)
+library(caret)
+
+# Appliquer la validation croisée K-Fold
+set.seed(123)  # Pour la reproductibilité
+folds <- createFolds(data$is_genuine, k = 10)
+
+# Calculer les performances pour chaque fold
+cv_results <- lapply(folds, function(fold) {
+  train_data <- data[-fold, ]
+  test_data <- data[fold, ]
+  
+  # Ajuster le modèle sur les données d'entraînement
+  model <- glm(is_genuine ~ height_left + height_right + margin_low + margin_up + length,
+                family = "binomial", data = train_data)
+  
+  # Prédictions sur les données de test
+  test_predictions <- predict(model, newdata = test_data, type = "response")
+  test_classes <- ifelse(test_predictions > 0.5, 1, 0)
+  
+  # Calculer la matrice de confusion et les mesures de performance
+  test_confusion_matrix <- table(Predicted = test_classes, Actual = test_data$is_genuine)
+  precision <- test_confusion_matrix[2, 2] / (test_confusion_matrix[2, 2] + test_confusion_matrix[1, 2])
+  recall <- test_confusion_matrix[2, 2] / (test_confusion_matrix[2, 2] + test_confusion_matrix[2, 1])
+  specificity <- test_confusion_matrix[1, 1] / (test_confusion_matrix[1, 1] + test_confusion_matrix[1, 2])
+  f1_score <- 2 * (precision * recall) / (precision + recall)
+  
+  return(c(precision = precision, recall = recall, specificity = specificity, f1_score = f1_score))
+})
+
+# Moyenne des résultats de validation croisée
+cv_results <- do.call(rbind, cv_results)
+mean_cv_results <- colMeans(cv_results)
+print(mean_cv_results)
+
+```
+Le lift est une mesure souvent utilisée pour évaluer l'amélioration de la prédiction par rapport à un modèle de base (par exemple, prédire la classe majoritaire). Les valeurs élevées du lift indiquent que votre modèle offre des améliorations significatives par rapport à des méthodes naïves.
+
+
+
+Conclusion
+Ces résultats montrent que votre modèle de régression logistique est très performant avec des scores de précision, de rappel, de spécificité et de F1-Score très élevés, ainsi qu'une AUC presque parfaite. Cela suggère que le modèle est bien ajusté à vos données et est capable de faire des prédictions avec une grande précision.
+
+Prochaines Étapes
+Validation Externe : Si possible, testez le modèle sur un jeu de données complètement indépendant pour vérifier sa généralisation.
+Analyse des Résidus : Examinez les résidus pour identifier tout modèle non détecté ou problème potentiel.
+Exploration de Modèles Alternatifs : Bien que le modèle de régression logistique semble excellent, vous pouvez explorer d'autres modèles pour comparer les performances.
+Implémentation et Déploiement : Si le modèle répond à vos attentes, vous pouvez envisager de l'implémenter dans un environnement de production.
+Ces étapes vous aideront à assurer que votre modèle est non seulement performant mais aussi robuste et fiable dans des conditions réelles.
