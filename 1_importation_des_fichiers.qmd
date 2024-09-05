@@ -834,15 +834,15 @@ Analyse des coefficients : 3 variables ont une valeur absolue élevée ce qui in
 Calculons les Odds Ratios pour indiquer comment les changements dans les variables indépendantes affectent la probabilité de vrais ou faux billets :
 
 ```{r}
-final_model <- glm(is_genuine ~ height_left + height_right + margin_low + 
+reg_log_model <- glm(is_genuine ~ height_left + height_right + margin_low + 
     margin_up + length,
 family="binomial",data=data)
-summary(final_model)
+summary(reg_log_model)
 ```
 
 ```{r}
 # Récupérer les coefficients du modèle final
-coefficients <- coef(final_model)
+coefficients <- coef(reg_log_model)
 
 # Calculer les odds ratios en exponentiant les coefficients
 odds_ratios <- exp(coefficients)
@@ -872,18 +872,18 @@ length: 372.5465 Une augmentation d'une unité de length augmente de manière si
 
 ##### Matrice de confusion
 
-La matrice de confusion vous permet de comparer les prédictions du modèle avec les valeurs réelles.
+La matrice de confusion permet de comparer les prédictions du modèle avec les valeurs réelles.
 
 ```{r}
 # Prédictions du modèle
-predictions <- predict(final_model, type = "response")
+predic_reg_log <- predict(reg_log_model, type = "response")
 
 # Convertir les probabilités en classes (0 ou 1) en utilisant un seuil de 0.5
-predicted_classes <- ifelse(predictions > 0.5, "True", "False")
+predic_reg_log_classes <- ifelse(predic_reg_log > 0.5, "True", "False")
 
 # Créer la matrice de confusion
-confusion_matrix <- table(Predicted = predicted_classes, Actual = data$is_genuine)
-print(confusion_matrix)
+confusion_reg_log <- table(Predicted = predic_reg_log_classes, Actual = data$is_genuine)
+print(confusion_reg_log)
 
 ```
 
@@ -903,9 +903,9 @@ F1-Score : Moyenne harmonique de la précision et de la sensibilité. 2x((precis
 
 ```{r}
 # Calculer les mesures de performance
-precision <- confusion_matrix[2, 2] / (confusion_matrix[2, 2] + confusion_matrix[2, 1])
-recall <- confusion_matrix[2, 2] / (confusion_matrix[2, 2] + confusion_matrix[1, 2])
-specificity <- confusion_matrix[1, 1] / (confusion_matrix[1, 1] + confusion_matrix[2, 1])
+precision <- confusion_reg_log[2, 2] / (confusion_reg_log[2, 2] + confusion_reg_log[2, 1])
+recall <- confusion_reg_log[2, 2] / (confusion_reg_log[2, 2] + confusion_reg_log[1, 2])
+specificity <- confusion_reg_log[1, 1] / (confusion_reg_log[1, 1] + confusion_reg_log[2, 1])
 f1_score <- 2 * (precision * recall) / (precision + recall)
 
 # Afficher les résultats
@@ -936,7 +936,7 @@ if (!require(pROC)) install.packages("pROC")
 library(pROC)
 
 # Calculer la courbe ROC
-roc_curve <- roc(data$is_genuine, predictions)
+roc_curve <- roc(data$is_genuine, predic_reg_log)
 
 # Tracer la courbe ROC
 plot(roc_curve, main = "Courbe ROC")
@@ -1006,7 +1006,7 @@ Nous allons ajuster le seuil pour réduire la probabilité de classer un faux bi
 
 ```{r}
 # Prédire les probabilités pour la classe positive
-predicted_prob <- predict(final_model, type = "response")
+predicted_prob <- predict(reg_log_model, type = "response")
 
 ```
 
@@ -1276,7 +1276,7 @@ y_test <- as.matrix(test_data$is_genuine)
 library(keras)
 
 # Créer le modèle
-model_neuronal <- keras_model_sequential() %>%
+model_neuronal_1 <- keras_model_sequential() %>%
   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x_train))) %>%
   layer_dense(units = 16, activation = 'relu') %>%
   layer_dense(units = 1, activation = 'sigmoid')
@@ -1285,7 +1285,7 @@ model_neuronal <- keras_model_sequential() %>%
 
 ```{r}
 # Compiler le modèle
-model_neuronal %>% compile(
+model_neuronal_1 %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(),
   metrics = c('accuracy')
@@ -1295,13 +1295,13 @@ model_neuronal %>% compile(
 
 ```{r}
 # Évaluer le modèle
-score <- model_neuronal %>% evaluate(x_test, y_test)
-print(score)
+score1 <- model_neuronal_1 %>% evaluate(x_test, y_test)
+print(score1)
 ```
 
 ```{r}
 # Créer le modèle
-model_neuronal <- keras_model_sequential() %>%
+model_neuronal_2 <- keras_model_sequential() %>%
   layer_dense(units = 64, activation = 'relu', input_shape = c(ncol(x_train))) %>%
   layer_dropout(rate = 0.5) %>%
   layer_dense(units = 32, activation = 'relu') %>%
@@ -1313,7 +1313,7 @@ model_neuronal <- keras_model_sequential() %>%
 
 ```{r}
 # Compiler le modèle
-model_neuronal %>% compile(
+model_neuronal_2 %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(learning_rate = 0.001),
   metrics = c('accuracy')
@@ -1324,8 +1324,8 @@ model_neuronal %>% compile(
 
 ```{r}
 # Évaluer le modèle
-score <- model_neuronal %>% evaluate(x_test, y_test)
-print(score)
+score2 <- model_neuronal_2 %>% evaluate(x_test, y_test)
+print(score2)
 ```
 
 ```{r}
@@ -1392,7 +1392,7 @@ print(score_dropout)
 library(keras)
 
 # Créer un modèle avec Dropout
-model <- keras_model_sequential() %>%
+model_neuronal_3 <- keras_model_sequential() %>%
   layer_dense(units = 64, activation = 'relu', input_shape = c(ncol(x_train))) %>%
   layer_dropout(rate = 0.5) %>%
   layer_dense(units = 32, activation = 'relu') %>%
@@ -1401,7 +1401,7 @@ model <- keras_model_sequential() %>%
   layer_dense(units = 1, activation = 'sigmoid')
 
 # Compiler le modèle
-model %>% compile(
+model_neuronal_3 %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(learning_rate = 0.001),
   metrics = c('accuracy')
@@ -1415,7 +1415,7 @@ early_stopping <- callback_early_stopping(
 )
 
 # Entraîner le modèle
-history <- model %>% fit(
+history <- model_neuronal_3 %>% fit(
   x_train, y_train,
   epochs = 20,
   batch_size = 32,
@@ -1424,8 +1424,8 @@ history <- model %>% fit(
 )
 
 # Évaluer le modèle
-score <- model %>% evaluate(x_test, y_test)
-print(score)
+score3 <- model_neuronal_3 %>% evaluate(x_test, y_test)
+print(score3)
 
 ```
 
@@ -1433,7 +1433,7 @@ print(score)
 library(keras)
 
 # Créer un modèle avec Dropout
-model <- keras_model_sequential() %>%
+model_neuronal_4 <- keras_model_sequential() %>%
   layer_dense(units = 64, activation = 'relu', input_shape = c(ncol(x_train))) %>%
   layer_dropout(rate = 0.5) %>%
   layer_dense(units = 32, activation = 'relu') %>%
@@ -1442,7 +1442,7 @@ model <- keras_model_sequential() %>%
   layer_dense(units = 1, activation = 'sigmoid')
 
 # Compiler le modèle
-model %>% compile(
+model_neuronal_4 %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(learning_rate = 0.001),
   metrics = c('accuracy')
@@ -1456,7 +1456,7 @@ early_stopping <- callback_early_stopping(
 )
 
 # Entraîner le modèle
-history <- model %>% fit(
+history <- model_neuronal_4 %>% fit(
   x_train, y_train,
   epochs = 20,
   batch_size = 32,
@@ -1465,9 +1465,33 @@ history <- model %>% fit(
 )
 
 # Évaluer le modèle
-score <- model %>% evaluate(x_test, y_test)
-print(score)
+score4 <- model_neuronal_4 %>% evaluate(x_test, y_test)
+print(score4)
 
 ```
 
+```{r}
+# 1. Faire des prédictions sur les données de test
+y_pred <- model_neuronal_4 %>% predict(x_test)
+
+# 2. Convertir les probabilités en classes (0 ou 1)
+y_pred_class <- ifelse(y_pred > 0.5, 1, 0)
+
+# 3. Créer la matrice de confusion
+conf_matrix <- table(Predicted = y_pred_class, Actual = y_test)
+
+# 4. Afficher la matrice de confusion
+print(conf_matrix)
+
+```
+
+```{r}
+# Installer et charger le package caret si ce n'est pas déjà fait
+# install.packages("caret")
+library(caret)
+
+# Utiliser caret pour obtenir une matrice de confusion plus détaillée
+confusionMatrix(as.factor(y_pred_class), as.factor(y_test))
+
+```
 
