@@ -52,7 +52,13 @@ print(final_predictions)
 ```
 
 ```{r}
+table(final_predictions)
+```
+```{r}
+# Associer les identifiants de billets avec les prédictions
+vertict <- data.frame(id = ids, is_genuine = final_predictions)
 
+print(vertict)
 ```
 
 

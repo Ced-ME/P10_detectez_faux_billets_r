@@ -1,7 +1,7 @@
 ---
 title: "Détecter des faux billets"
 author: "CME"
-format: html
+format: pdf
 editor: visual
 ---
 
@@ -20,6 +20,11 @@ Le client souhaite que vous travailliez directement depuis ses locaux sous la re
 Après avoir lu en détail le cahier des charges, vous vous préparez à vous rendre à l’ONCFM pour prendre vos nouvelles fonctions. Vous notez tout de même un post-it qui se trouve sur le coin de votre bureau, laissé par un de vos collègues :
 
 ## II- Importation des fichiers
+
+```{r}
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
+
 
 ```{r}
 data <- read.csv("data_raw/billets.csv", sep =";")
@@ -1493,5 +1498,19 @@ library(caret)
 # Utiliser caret pour obtenir une matrice de confusion plus détaillée
 confusionMatrix(as.factor(y_pred_class), as.factor(y_test))
 
+```
+
+Sauvegarde du modèle à utiliser
+
+```{r}
+# Sauvegarder le modèle neuronales (librairie keras)
+model_neuronal_4 %>% save_model_hdf5("model_faux_billets.h5")
+
+```
+
+```{r}
+# Sauvegarder le modèle et le seuil
+saveRDS(reg_log_model, "modele_regression_logistique.rds")
+saveRDS(best_threshold, "seuil_optimal.rds")
 ```
 
