@@ -1,8 +1,12 @@
 ---
 title: "detection_faux_billets"
-format: html
+format: pdf
 editor: visual
 ---
+
+```{r}
+options(repos = c(CRAN = "https://cran.rstudio.com/"))
+```
 
 ```{r}
 new_data <- read.csv("data_raw/billets_production.csv", sep =",")
@@ -63,6 +67,17 @@ print(vertict)
 
 
 ou
+
+
+```{r}
+# Utilisez le nouvel environnement Conda
+library(reticulate)
+
+# Utilisez le nouvel environnement Conda
+use_condaenv("tf-env", required = TRUE)
+
+library(keras)
+```
 
 
 ```{r}

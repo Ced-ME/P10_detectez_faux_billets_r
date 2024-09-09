@@ -912,13 +912,15 @@ precision <- confusion_reg_log[2, 2] / (confusion_reg_log[2, 2] + confusion_reg_
 recall <- confusion_reg_log[2, 2] / (confusion_reg_log[2, 2] + confusion_reg_log[1, 2])
 specificity <- confusion_reg_log[1, 1] / (confusion_reg_log[1, 1] + confusion_reg_log[2, 1])
 f1_score <- 2 * (precision * recall) / (precision + recall)
+# Calculer Accuracy
+model_regression_logistic_accuracy <- (confusion_reg_log[1, 1] + confusion_reg_log[2, 2]) / sum(confusion_reg_log)      # (TP + TN) / Total
 
 # Afficher les résultats
 cat("Précision: ", precision, "\n")
 cat("Sensibilité (Recall): ", recall, "\n")
 cat("Spécificité: ", specificity, "\n")
 cat("F1-Score: ", f1_score, "\n")
-
+cat("Accuracy: ", model_regression_logistic_accuracy, "\n")
 ```
 
 Précision (Precision) : 0.991 Cela signifie que parmi toutes les instances que le modèle a classées comme True, 99.1% sont effectivement True. C'est un excellent résultat, indiquant que le modèle est très précis dans ses prédictions positives.
@@ -1075,12 +1077,14 @@ precision_2 <- final_confusion_matrix[2, 2] / (final_confusion_matrix[2, 2] + fi
 recall_2 <- final_confusion_matrix[2, 2] / (final_confusion_matrix[2, 2] + final_confusion_matrix[1, 2])
 specificity_2 <- final_confusion_matrix[1, 1] / (final_confusion_matrix[1, 1] + final_confusion_matrix[2, 1])
 f1_score_2 <- 2 * (precision_2 * recall_2) / (precision_2 + recall_2)
-
+# Calculer Accuracy
+model_regression_logistic2_accuracy <- (confusion_reg_log[1, 1] + confusion_reg_log[2, 2]) / sum(confusion_reg_log)      # (TP + TN) / Total
 # Afficher les résultats
 cat("Précision: ", precision_2, "\n")
 cat("Sensibilité (Recall): ", recall_2, "\n")
 cat("Spécificité: ", specificity_2, "\n")
 cat("F1-Score: ", f1_score_2, "\n")
+cat("Accuracy: ", model_regression_logistic2_accuracy, "\n")
 ```
 
 En regardant les performances globales, on voit que nous avons effectivement améliorer la Spécificité, c'est à dire le risque de faux positifs, passant de 0.982 à 0.998. 99.8% des faux billets sont détectés. Nous avons également augmenté la précision passant de 0.991 à 0.998, cela signifie que 99.8% des billets classés dans "True" sont réellement vrais.
@@ -1219,10 +1223,16 @@ print(rf_model_tuned$bestTune)
 predictions <- predict(rf_model_tuned, testFeatures)
 
 # Évaluer le modèle
-confusionMatrix(predictions, testTarget)
-
+cm_random_forest <- confusionMatrix(predictions, testTarget)
+cm_random_forest
 
 ```
+
+```{r}
+model_random_forest_accuracy <- cm_random_forest$overall["Accuracy"]
+model_random_forest_accuracy
+```
+
 
 Essayons avec la méthode de Réseau Neuronal
 
@@ -1496,9 +1506,16 @@ print(conf_matrix)
 library(caret)
 
 # Utiliser caret pour obtenir une matrice de confusion plus détaillée
-confusionMatrix(as.factor(y_pred_class), as.factor(y_test))
-
+cm_reseau_neuronal <- confusionMatrix(as.factor(y_pred_class), as.factor(y_test))
+cm_reseau_neuronal
 ```
+
+COMPARAISON DES PERFORMANCES ENTRE LES MODELES
+```{r}
+model_neuronal_accuracy <- cm_reseau_neuronal$overall["Accuracy"]
+model_neuronal_accuracy
+```
+
 
 Sauvegarde du modèle à utiliser
 
