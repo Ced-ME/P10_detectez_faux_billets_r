@@ -499,190 +499,6 @@ p-value : La p-value obtenue est de 0.4773.
 
 Comme la p-value est bien supérieure au seuil de signification de 0.05, on ne rejete pas l'hypothèse nulle. Cela indique qu'il n'y a pas suffisamment de preuves pour conclure qu'il existe une hétéroscédasticité significative dans les résidus du modèle où seule la variable dépendante a été transformée par l'inverse.
 
-Avec cette méthode nous pouvons utiliser la régréssion linéaire pour prédire margin_low, la non-colinéarité et l'homoscédacité sont réspectée.
-
-Nous pouvons également tester la régréssion linéaire multiple en séparant le jeu de données en 2, données "True" et données "False" et tester la performance.
-
-#### d- Régression linéaire en séparant "True" et "False"
-
-Nous pouvons également tester la régréssion linéaire multiple en séparant le jeu de données en 2, données "True" et données "False" et tester la performance.
-
-##### Données "True"
-```{r}
-data_without_na_true <- data_without_na[data_without_na$is_genuine == "True", ]
-data_without_na_true
-```
-
-```{r}
-# Régression linéaire multiple pour prédire la variable margin_low
-reg_lin_true <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_true)
-summary(reg_lin_true)
-```
-
-Seule la variable "margin_up" semble avoir une influence relative sur "margin_low" bien qu'elle ne soit pas concluante avec un niveau de signification de 0.05.
-Les autres variables n'ont pas d'influence significative.
-
-Méthode de sélection automatique des variables
-
-```{r}
-reg_true_null <- lm(margin_low~1, data=data_without_na_true)
-reg_true_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_true)
-```
-
-```{r}
-#Méthode backward
-reg_true_backward <- step(reg_true_tot, direction="backward")
-```
-
-Échantillonnage des Données pour Validation Croisée : Ensembles d'Entraînement et de Test
-```{r}
-set.seed(142)  # Pour rendre les résultats reproductibles
-
-# Définir la proportion pour l'ensemble de test
-test_proportion <- 0.2
-
-# Calculer le nombre d'observations pour l'ensemble de test
-total_rows <- nrow(data_without_na_true)
-test_size <- round(test_proportion * total_rows)
-
-# Créer un échantillon aléatoire d'indices pour l'ensemble de test
-test_indices <- sample(1:total_rows, test_size)
-
-# Créer les ensembles de test et d'entraînement
-test_data <- data_without_na_true[test_indices, ]
-train_data <- data_without_na_true[-test_indices, ]
-```
-
-```{r}
-# Entraîner le modèle avec les données d'entraînement
-reg_true_final <- lm(margin_low ~ margin_up, data = train_data)
-summary(reg_true_final)
-```
-
-```{r}
-# Prédictions avec le modèle sur les données de test
-predictions <- predict(reg_true_final, test_data)
-```
-
-```{r}
-# Calculer les valeurs réelles de margin_low dans l'ensemble de test
-actual_values <- test_data$margin_low
-
-# Calculer les erreurs
-error <- abs(predictions - actual_values)
-rmse <- sqrt(mean((predictions - actual_values)^2))
-mae <- mean(error)
-
-# Afficher les résultats
-print(rmse)
-print(mae)
-```
-RMSE indique la racine carrée de la moyenne des carrés des erreurs
-MAE mesure la moyenne des valeurs absolues des erreurs de prédiction.
-
-Nous pouvons visualiser les résultats à l'aide d'un nuage de points.
-```{r}
-library(ggplot2)
-
-results <- data.frame(
-  margin_up = test_data$margin_up,
-  Predicted_margin_low = predictions,
-  Actual_margin_low = actual_values
-)
-
-# Visualiser les résultats
-ggplot(results, aes(x = margin_up)) +
-  geom_point(aes(y = Predicted_margin_low, color = "Prédictions")) +
-  geom_point(aes(y = Actual_margin_low, color = "Réels")) +
-  labs(y = "margin_low", color = "Type") +
-  theme_minimal()
-```
-En rouge nous voyons les prédictions issues de la régression linéaire et en bleu les valeurs réels.
-
-##### Donéées "False"
-
-```{r}
-data_without_na_false <- data_without_na[data_without_na$is_genuine == "False", ]
-data_without_na_false
-```
-
-```{r}
-# Régression linéaire multiple pour prédire la variable margin_low
-reg_multi_false <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_false)
-summary(reg_multi_false)
-```
-
-```{r}
-reg_false_null <- lm(margin_low~1, data=data_without_na_false)
-reg_false_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_false)
-```
-
-```{r}
-#Méthode backward
-reg_false_backward <- step(reg_false_tot, direction="backward")
-```
-
-```{r}
-set.seed(123)  # Pour rendre les résultats reproductibles
-
-# Définir la proportion pour l'ensemble de test
-test_proportion <- 0.2
-
-# Calculer le nombre d'observations pour l'ensemble de test
-total_rows <- nrow(data_without_na_false)
-test_size <- round(test_proportion * total_rows)
-
-# Créer un échantillon aléatoire d'indices pour l'ensemble de test
-test_indices <- sample(1:total_rows, test_size)
-
-# Créer les ensembles de test et d'entraînement
-test_data <- data_without_na_false[test_indices, ]
-train_data <- data_without_na_false[-test_indices, ]
-```
-
-```{r}
-# Entraîner le modèle avec les données d'entraînement
-reg_multi_final <- lm(margin_low ~ margin_up, data = train_data)
-summary(reg_multi_final)
-```
-
-```{r}
-# Prédictions avec le modèle sur les données de test
-predictions <- predict(reg_multi_final, test_data)
-```
-
-```{r}
-# Calculer les valeurs réelles de margin_low dans l'ensemble de test
-actual_values <- test_data$margin_low
-
-# Calculer les erreurs
-error <- abs(predictions - actual_values)
-rmse <- sqrt(mean((predictions - actual_values)^2))
-mae <- mean(error)
-
-# Afficher les résultats
-print(rmse)
-print(mae)
-```
-
-```{r}
-library(ggplot2)
-
-results <- data.frame(
-  margin_up = test_data$margin_up,
-  Predicted_margin_low = predictions,
-  Actual_margin_low = actual_values
-)
-
-# Visualiser les résultats
-ggplot(results, aes(x = margin_up)) +
-  geom_point(aes(y = Predicted_margin_low, color = "Prédictions")) +
-  geom_point(aes(y = Actual_margin_low, color = "Réels")) +
-  labs(y = "margin_low", color = "Type") +
-  theme_minimal()
-```
-
-Ce dernier modèle en séparant les data "True" et "False" semble avoir une capacité prédictive limitée. Ce ne sera pas ce modèle que nous conserverons.
 
 Nous allons utiliser la régression linéaire, en appliquant une transformation inverse à la variable dépendante, afin de garantir la non-colinéarité et l'homoscédasticité des résidus. La non-colinéarité permet d'éviter la redondance entre les variables explicatives, assurant ainsi des estimations fiables des coefficients, tandis que l'homoscédasticité garantit que la variance des résidus reste constante, condition essentielle pour des tests statistiques valides et des intervalles de confiance précis.
 
@@ -754,8 +570,11 @@ Les résidus montrent une distribution qui est globalement normale et symétriqu
 
 ## VI- ACP et Clustering
 
-### 1- Recherche de valeurs aberrantes
+Nous allons désormais réaliser une analyse exploratoire des regroupements possible de billets à l'aide de la méthode des K-means qui est une méthode non supervisée et qui nous donnera un aperçu du regroupement naturel des billets en fonction de leurs mesures sans tenir compte de l'information "vrai" et "faux" de "is_genuine".
+Et nous allons pour commencer réaliser une ACP pour réduire la dimensionnalité et découvrir les corrélations entre les variables.
 
+### 1- Recherche de valeurs aberrantes
+#### a- Boxplot des variables
 ```{r}
 # Boxplot pour chaque variable numérique
 data_numeric <- data %>% select(where(is.numeric))
@@ -767,14 +586,33 @@ for (col in colnames(data_numeric)) {
 }
 
 ```
-
+#### b- Scatterplot des paires de variables
 ```{r}
-# Scatter plot entre deux variables
-plot(data$diagonal, data$height_left, main = "Diagonale vs. Hauteur gauche", xlab = "Diagonale", ylab = "Hauteur gauche")
+if (!require(GGally)) install.packages("GGally")
+library(GGally)
+# Affichage des scatter plots avec corrélation, noms des variables, et sans valeurs des axes
+plot <- ggpairs(data[, c("diagonal", "height_left", "height_right", "margin_low", "margin_up", "length")], 
+                title = "Scatter plots avec corrélation",
+                upper = list(continuous = wrap("cor", size = 5)),   # Corrélation dans la partie supérieure
+                lower = list(continuous = "points"),               # Nuages de points dans la partie inférieure
+                diag = list(continuous = wrap("barDiag", size = 5)),# Distribution diagonale
+                axisLabels = "show")                               # Affiche les noms des variables
 
+# Personnaliser pour retirer les valeurs numériques des axes mais garder les noms des variables
+plot <- plot + theme(
+  axis.text.x = element_blank(),  # Supprime les valeurs numériques de l'axe des abscisses
+  axis.text.y = element_blank(),  # Supprime les valeurs numériques de l'axe des ordonnées
+  axis.ticks = element_blank()    # Supprime les ticks des axes
+)
+
+# Afficher le graphique
+print(plot)
 ```
 
-#### a- Méthode IQR
+La dispersion des points indique qu'il n'y a pas de corrélation évidente et linéaire entre 2 variables
+
+
+#### c- Méthode IQR
 
 ```{r}
 # Calculer l'IQR pour chaque colonne
@@ -834,7 +672,7 @@ Il y a 53 lignes d'outliers avec la méthode IQR\
 40 lignes concernent des faux billets\
 13 lignes concernent de vrais billets
 
-#### b- Méthode Z_score
+#### d- Méthode Z_score
 
 ```{r}
 if (!require(tidyverse)) install.packages("tidyverse")
@@ -926,7 +764,7 @@ je le nommerai "data_without_ouliers_z"
 
 ```{r}
 data_without_ouliers_z <- data[-z_outliers_indices, ]
-data_without_ouliers_z
+summary(data_without_ouliers_z)
 ```
 
 ### 3- ACP
@@ -959,6 +797,7 @@ pourcentage_inertie <- 100 * valeurs_propres / sum(valeurs_propres)
 cumulative_inertia <- cumsum(pourcentage_inertie)
 ```
 
+#### a- Eboulis des Composantes Principales
 ```{r}
 # Créer un graphique avec un seul appel
 par(mfrow = c(1, 1)) # Assurez-vous d'avoir une seule fenêtre graphique
@@ -977,16 +816,20 @@ plot(cumulative_inertia, type = "o", col = "red", pch = 19,
 # Ajouter une légende
 legend("topright", legend = c("Inertie Cumulée (%)"), col = "red", pch = 19, inset = c(0, 0.5))
 ```
+On remarque avec l'ébouli qu'il est nécessaire d'avoir 5 composantes pour expliquer 90% de l'inertie des 6 variables.
+Il n'est pas très utile de réduire la dimensionalité dans notre si nous perdons en précision pour expliquer la variance.
+
+Nous pouvons cependant réaliser l'ACP pour afficher le cercle des corrélations, notamment pour les 2 premières dimensions qui expliquent 60% de la variance totale.
 
 ```{r}
-# on choisit 4 composantes principales qui représentent 80% de la variance
-resultat_acp_optimal <- PCA(datanum_without_ouliers_z, scale.unit = TRUE, ncp = 4, graph = FALSE)
+# on choisit 2 composantes principales qui représentent 60% de la variance
+resultat_acp_optimal <- PCA(datanum_without_ouliers_z, scale.unit = TRUE, ncp = 2, graph = FALSE)
 
 ```
 
 ```{r}
 # Visualiser les individus et les variables pour les premières et dernières combinaisons de composantes
-pairs_to_plot <- list(c(1, 2), c(3, 4))  # Choisir les paires de composantes à afficher
+pairs_to_plot <- list(c(1, 2))  # Choisir les paires de composantes à afficher
 
 # Visualiser les individus et les variables pour les différentes combinaisons de composantes
 for (pair in pairs_to_plot) {
@@ -1029,8 +872,8 @@ scores <- resultat_acp_optimal$ind$coord
 head(scores)
 ```
 
-### 4- Clustering
-
+### 4- Clustering avec K-means
+#### a- Méthode du coude
 ```{r}
 # Définir une plage de nombres de clusters à tester
 k_values <- 1:10  # Tester de 1 à 10 clusters
@@ -1047,12 +890,15 @@ plot(k_values, wss, type = "b", pch = 19, col = "blue",
      xlab = "Nombre de Clusters", ylab = "Somme des Carrés Intra-Cluster",
      main = "Méthode du Coude pour K-means Clustering")
 ```
+La méthode du coude indique que l'ajout de clusters au-delà de 2 n'améliore plus significativement la dispersion intra-cluster, suggérant que 2 clusters est le nombre optimal.  
+En utilisant 2 clusters avec K-means, on obtient une séparation efficace des données tout en évitant une complexité inutile.
 
-TEST AVEC 2 CLUSTERS
+
+#### b- Test avec 2 Clusters
 
 ```{r}
 # Appliquer K-means clustering avec 2 clusters
-kmeans_result <- kmeans(scores, centers = 2, nstart = 23)  # nstart pour la reproductibilité
+kmeans_result <- kmeans(scores, centers = 2, nstart = 25)  # nstart pour la reproductibilité
 
 ```
 
@@ -1088,7 +934,7 @@ plot_clusters <- plot_clusters +
 print(plot_clusters)
 
 ```
-
+Centroids :
 ```{r}
 # Centres des clusters
 print(kmeans_result$centers)
@@ -1119,11 +965,17 @@ print(count_values)
   
 ```
 
-TEST AVEC 3 CLUSTERS
+La répartition des "False" et "True" de chaque cluster nous indique que :
+- Le cluster 1 correspond aux faux billets avec 96.7 % de faux billets
+- Le cluster 2 correspond aux vrais billets avec 98.8 % de vrais billets
+
+Naturellement la méthode des K-means a séparé notre jeu de donnée en 2 groupes avec une efficacité globale ou accuracy de 98.10 %.
+
+#### c- Test avec 3 Clusters
 
 ```{r}
 # Appliquer K-means clustering avec 3 clusters
-kmeans_result_2 <- kmeans(scores, centers = 3, nstart = 33)  # nstart pour la reproductibilité
+kmeans_result_2 <- kmeans(scores, centers = 3, nstart = 36)  # nstart pour la reproductibilité
 
 ```
 
@@ -1189,8 +1041,16 @@ count_values  <- data_with_clusters_2 %>%
 print(count_values)
   
 ```
+Ici nous avons :
+- cluster 1 avec 98.1 % de faux billets
+- cluster 2 avec 97.7 % de vrais billets
+- cluster 3 avec 99 % de vrais billets
+pour une efficacité globale de 98.3 %
+
+Il y a une meilleure efficacité au global, le cluster 3 atteint jusqu'à 99% de vrais billets mais cela ne nous aide pas énormément dans notre objectif de détecter les faux billets.
 
 Le but était de vérifier comment se comportait le modèle avec 3 clusters. L'idéal aurait été un clustering avec 100 % de vrai dans un cluster 100 % de faux dans un autre cluster et les douteux dans un 3ème cluster
+
 
 ## VII- Régression Logistique
 
