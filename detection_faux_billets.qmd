@@ -12,7 +12,6 @@ options(repos = c(CRAN = "https://cran.rstudio.com/"))
 new_data <- read.csv("data_raw/billets_test (4).csv", sep =",")
 ```
 
-
 ```{r}
 head(new_data)
 ```
@@ -33,7 +32,6 @@ new_data <- new_data[, -which(names(new_data) == "id")]
 new_data_scaled <- scale(new_data)
 ```
 
-
 ```{r}
 # Charger le modèle ajusté et le seuil optimal
 reg_log_model <- readRDS("modele_regression_logistique.rds")
@@ -44,7 +42,6 @@ best_threshold <- readRDS("seuil_optimal.rds")
 # Faire des prédictions de probabilités sur de nouvelles données
 predicted_prob_new <- predict(reg_log_model, new_data, type = "response")
 ```
-
 
 ```{r}
 # Appliquer le seuil optimal pour classer les probabilités
@@ -59,6 +56,7 @@ print(final_predictions)
 ```{r}
 table(final_predictions)
 ```
+
 ```{r}
 # Associer les identifiants de billets avec les prédictions
 vertict <- data.frame(id = ids, is_genuine = final_predictions, proba = round(predicted_prob_new*100,2))
@@ -66,9 +64,7 @@ vertict <- data.frame(id = ids, is_genuine = final_predictions, proba = round(pr
 print(vertict)
 ```
 
-
 ou
-
 
 ```{r}
 # Utilisez le nouvel environnement Conda
@@ -79,7 +75,6 @@ use_condaenv("tf-env", required = TRUE)
 
 library(keras)
 ```
-
 
 ```{r}
 # Charger le modèle sauvegardé (réseau neuronal)
@@ -122,4 +117,3 @@ write.csv(results, "prediction_results.csv", row.names = FALSE)
 print(results)
 
 ```
-

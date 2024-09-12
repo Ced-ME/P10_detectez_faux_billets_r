@@ -1085,11 +1085,26 @@ On peut donc passer sur une procédure de sélection en retirant les variables n
 library(MASS)
 stepAIC(reg_log, direction = "both")
 ```
+Critère AIC initial 97.22
+Après avoir retiré "diagonal", le modèle à le meilleur AIC avec 95.23.
+Les autres étapes de suppression de variable augmentent l'AIC ce qui indique qu'elles sont importantes pour le modèle.
 
-La procédure de sélection de modèle nous a permis de déterminer que les variables "diagonal" et "height_left" n'étaient pas nécessaires pour le modèle final. Les variables restantes ("height_right", "margin_low", "margin_up", et "length") sont significatives et ont un impact important sur le modèle.\
+La procédure de sélection de modèle nous a permis de déterminer que la variable "diagonal" n'était pas nécessaire pour le modèle final. Les variables restantes ("height_right", "height_right", "margin_low", "margin_up", et "length") sont significatives et ont un impact important sur le modèle.\
 Nous avons réussi à réduire l'AIC, indiquant que le modèle final est plus parcimonieux tout en conservant une bonne qualité d'ajustement.
 
-Analyse des coefficients : 3 variables ont une valeur absolue élevée ce qui indique qu'elles ont plus d'importance et d'influence dans la prédiction. - "margin_up" a un coeff négatif de -10.167 ce qui indique que plus la marge haute haute augmente, plus il y a de chance qu'il s'agisse d'un faux billet. - "margin_low" avec un coeff négatif également de -5.794 a également une influence importante et indique que l'augmentation de la marge basse augmente les probabilités qu'il s'agisse d'un faux billet. - "length" a un coeff positif de 5.920 qui indique à l'inverse que l'augmentation de la longueur du billet augmente la probabilité qu'il s'agisse d'un vrai billet.
+#### a- Analyse des coefficients  
+
+3 variables ont une valeur absolue élevée ce qui indique qu'elles ont plus d'importance et d'influence dans la prédiction.  
+
+1 correspondant à la valeur "vrai" de is_genuine, un coefficient positif indique que si la valeur augmente, la probabilité de "vrai" billet augmente également
+inversement un coefficient négatif indique que plus la valeur de la variable augmente plus la probabilité d'un "faux" billet augmente également.
+
+- "margin_up" a un coeff négatif de -10.203 ce qui indique que plus la marge haute augmente, plus il y a de chance qu'il s'agisse d'un faux billet.  
+- "margin_low" avec un coeff négatif également de -5.910 a également une influence importante et indique que l'augmentation de la marge basse augmente les probabilités qu'il s'agisse d'un faux billet.  
+- "length" a un coeff positif de 5.988 qui indique à l'inverse que l'augmentation de la longueur du billet augmente la probabilité qu'il s'agisse d'un vrai billet.
+
+
+#### b- Odds Ratios
 
 Calculons les Odds Ratios pour indiquer comment les changements dans les variables indépendantes affectent la probabilité de vrais ou faux billets :
 
