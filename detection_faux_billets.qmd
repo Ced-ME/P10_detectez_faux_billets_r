@@ -9,7 +9,7 @@ options(repos = c(CRAN = "https://cran.rstudio.com/"))
 ```
 
 ```{r}
-new_data <- read.csv("data_raw/billets_production.csv", sep =",")
+new_data <- read.csv("data_raw/billets_test (4).csv", sep =",")
 ```
 
 
@@ -45,6 +45,7 @@ best_threshold <- readRDS("seuil_optimal.rds")
 predicted_prob_new <- predict(reg_log_model, new_data, type = "response")
 ```
 
+
 ```{r}
 # Appliquer le seuil optimal pour classer les probabilités
 final_predictions <- ifelse(predicted_prob_new > best_threshold, "True", "False")
@@ -60,7 +61,7 @@ table(final_predictions)
 ```
 ```{r}
 # Associer les identifiants de billets avec les prédictions
-vertict <- data.frame(id = ids, is_genuine = final_predictions)
+vertict <- data.frame(id = ids, is_genuine = final_predictions, proba = round(predicted_prob_new*100,2))
 
 print(vertict)
 ```
@@ -99,8 +100,21 @@ print(predicted_class)
 ```
 
 ```{r}
+# Faire des prédictions sur le nouveau jeu de données
+pred <- model %>% predict(new_data_scaled)
+
+# Convertir les probabilités en classes (0 ou 1)
+pred_class <- ifelse(pred > 0.95, "vrai",
+                          ifelse(pred < 0.05, "faux", "A_verifier"))
+
+# Afficher les résultats
+print(pred_class)
+
+```
+
+```{r}
 # Associer les identifiants de billets avec les prédictions
-results <- data.frame(id = ids, is_genuine = predicted_class)
+results <- data.frame(id = ids, is_genuine = predicted_class, proba = round(predictions*100,2))
 
 # Afficher ou sauvegarder les résultats dans un fichier CSV
 write.csv(results, "prediction_results.csv", row.names = FALSE)

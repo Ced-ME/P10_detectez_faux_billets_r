@@ -21,10 +21,13 @@ Après avoir lu en détail le cahier des charges, vous vous préparez à vous re
 
 ## II- Importation des fichiers
 
+Définir le miroir CRAN pour l'installation de packages R
+
 ```{r}
 options(repos = c(CRAN = "https://cran.rstudio.com/"))
 ```
 
+Lecture du fichier csv
 
 ```{r}
 data <- read.csv("data_raw/billets.csv", sep =";")
@@ -43,26 +46,28 @@ Nous avons un dataframe de 7 colonnes et 1 500 lignes 1 colonne de type characte
 ```{r}
 if (!require(skimr)) install.packages("skimr")
 library(skimr)
-
 skim(data)
-
 ```
 
 Nous avons 37 valeurs manquantes dans la colonne margin_low
 
+On affiche les lignes ou "margin_low" est NA
+
 ```{r}
-# Afficher les lignes où 'margin_low' est NA
 missing_margin_low <- data[is.na(data$margin_low), ]
 print(missing_margin_low)
-
 ```
+
+Quelles sont les valeurs de "is_genuine" ?
 
 ```{r}
 valeur_unique <- unique(data$is_genuine)
 print(valeur_unique)
 ```
 
-Nous avons 2 valeurs uniques dans la colonne is_genuine =\> True ou False
+Nous avons 2 valeurs uniques dans la colonne is_genuine =\> "True" ou "False"
+
+Combien y a-t-il de chacune de ces valeurs ?
 
 ```{r}
 valeur_compte <- table(data$is_genuine)
@@ -70,6 +75,8 @@ print(valeur_compte)
 ```
 
 Il y a **500 valeurs False** et **1 000 valeurs True**
+
+Visualisation sous forme de diagramme en secteurs
 
 ```{r}
 # Calcul des pourcentages
@@ -100,12 +107,12 @@ text(x = cos(2 * pi * positions / sum(valeur_compte)) * 0.5,
 
 ### En résumé
 
-Nous avons un tableau regroupant les données de 1 500 billets\
+**Nous avons un tableau regroupant les données de 1 500 billets**\
 
-1 colonne décrivant s'il s'agit de vrais ou faux billets :\
+**1 colonne décrivant s'il s'agit de vrais ou faux billets :**\
 - il y a 1 000 vrais billets 66.7% et 500 faux billets 33.3%\
 
-6 colonne décrivants le format de ces billets :\
+**6 colonne décrivants le format de ces billets :**\
 - diagonale\
 - hauteur gauche\
 - hauteur droite\
@@ -113,7 +120,7 @@ Nous avons un tableau regroupant les données de 1 500 billets\
 - marge haute\
 - longueur\
 
-***37 billets*** n'ont pas l'information de la marge basse dans le tableau.
+***37 billets*** n'ont pas l'information de la marge basse ("margin_low") dans le tableau.
 
 Nous allons aggréger les données sur la colonnne is_genuine\
 Afficher la valeur moyenne de chaque variable pour les lignes False et True afin de voir si nous pouvons observer des différences significatives sur une ou plusieurs variables.
@@ -142,26 +149,65 @@ Nous avons la possibilité de retirer ces 37 lignes ou bien de déterminer les v
 
 Regréssion linéaire multiple : Nous utilisons toutes les variables pour commencer et nous allons voir si elles sont toutes significatives pour la détermination de "margin_low". Nous fixons notre seuil de test à 5% Toutes les p-valeur inférieure à 0.05 seront donc considérée comme significatives. Si toutes les variables ne sont pas significatives, nous utiliserons la méthode backward et retirerons une à une toutes les variables non significatives.
 
-```{r}
-# Supprimer les lignes où 'margin_low' est NaN
-data_without_na <- data[!is.na(data$margin_low), ]
+Pour réaliser notre modèle de régression linéaire, nous allons travailler sur notre jeu de données sans NA
 
+### 1- Régréssion linéaire
+
+```{r}
+# Suppression des lignes où 'margin_low' est NaN
+data_without_na <- data[!is.na(data$margin_low), ]
 ```
 
 ```{r}
-reg_multi <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na)
-summary(reg_multi)
+# Régression linéaire multiple pour prédire la variable margin_low
+reg_lin <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na)
+summary(reg_lin)
 ```
 
 Les variables sont toutes significatives car leur p-value est inférieure à 5% (0.05) le niveau de test que nous souhaitons. Nous conservons donc toutes les variables pour la détermination de 'margin_low'
 
-Nous pouvons tester le modèle sous forme de prédiction en renseignant toutes les variables pour déterminer une valeur à margin_low
+Nous aurions pu vouloir sélectionner automatiquement un modèle avec l'ensemble des variables avec le package stat
+
 
 ```{r}
-prev <- data.frame(diagonal=169, height_left=105, height_right=105, margin_up=3, length=115)
-marg_low_prev <- predict(reg_multi, prev)
+reg_null <- lm(margin_low~1, data=data_without_na)
+reg_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data)
+```
+
+```{r}
+#Méthode backward
+reg_backward <- step(reg_tot, direction="backward")
+```
+
+Le résultat nous montre que toutes les variables explicatives sont importantes dans le modèle pour prédire margin_low. la suppression de length à l'impact le plus négatif sur le modèle augmentant considérablement le RSS (somme des carrés des résidus) chaque suppression rend le modèle moins performant. Le modèle final sera le modèle complet
+
+**Partons sur le modèle "reg_lin"** Nous pouvons tester le modèle sous forme de prédiction en renseignant toutes les variables pour déterminer une valeur à margin_low
+
+### 2- Test du modèle
+
+ici nous prenons une ligne au hasard, prenons les valeurs des 5 autres variables et nous allons prédire "margin_low" et contrôler que la valeur est proche de la valeur connue.
+
+```{r}
+data[90,]
+```
+
+```{r}
+prev <- data.frame(diagonal=171.94, height_left=103.49, height_right=103.82, margin_up=3.19, length=113.05)
+marg_low_prev  <- predict(reg_lin, prev)
 round(marg_low_prev,digits=2)
 ```
+
+cela nous donnerait une valeur de 4.22 de "margin_low" d'après le modèle de régréssion linéaire C'est très proche des 4.24 réel.
+
+Nous pourrions améliorer le modèle en calculant les mesures d'influence afin d'identifier et visualiser les observations atypiques. Cela permettrait de mieux comprendre leur impact sur les résultats de la régression linéaire.
+
+### 3- Mesures d'influence
+
+#### a- Les Leviers
+
+Les Leviers mesurent l'influence des points de données sur les valeurs prédites, avec un focus sur l'échantillonnage de chaque observation.
+
+Définition des paramètres
 
 ```{r}
 #niveau de test
@@ -172,16 +218,22 @@ n <- dim(data_without_na)[1]
 p <- 6
 ```
 
+Création d'un dataframe pour l'analyse
+
 ```{r}
 #analyse sur les valeurs atypique ou influantes
 analyses <- data.frame(obs=1:n)
 ```
 
+Calcul des leviers et définition du seuil
+
 ```{r}
 #calcul des leviers
-analyses$levier <- hat(model.matrix(reg_multi))
+analyses$levier <- hat(model.matrix(reg_lin))
 seuil_levier <- 2*p/n
 ```
+
+Visualisation des leviers
 
 ```{r}
 library(ggplot2)
@@ -191,20 +243,47 @@ ggplot(data=analyses, aes(x=obs,y=levier))+
   theme_minimal()+
   xlab("Observation")+
   ylab("Leviers")+
-  scale_x_continuous(breaks=seq(0,n,by=5))
+  scale_x_continuous(breaks=seq(0,n,by=100))
 ```
 
+Ensuite nous pourrions identifier les observations pour lesquelles les leviers sont supérieurs au seuil défini
+
 ```{r}
-#pour récupérer les numéros des observations pour lesquels les leviers sont supérieurs au seuil
+# crée un vecteur logique True = levier qui dépasse le seuil, sinon False
 idl <- analyses$levier>seuil_levier
+# affiche les premieres valeur du vecteur idl
 head(idl)
+# Affiche les valeurs de levier qui ont une valeur de vecteur True donc influente
 analyses$levier[idl]
 ```
 
-Calculer les résidus studentisés
+Nous pouvons afficher ces observations dans le dataframe initial (data_without_na)
 
 ```{r}
-analyses$rstudent <- rstudent(reg_multi)
+# Récupère les indices des lignes où idl est True
+indices_influents <- which(idl)
+# Affiche les lignes du DataFrame data_without_na avec ces indices
+data_influents <- data_without_na[indices_influents, ]
+# Affiche le DataFrame filtré
+summary(data_influents)
+```
+
+Nous pouvons désormais observer si ces observations concernent plutôt des "vrais" ou "faux" billets.
+
+```{r}
+table(data_influents$is_genuine)
+```
+
+Avec ce seuil, On constate qu'il s'agit majoritairement de vrais billets.
+
+#### b- Résidus Studentisés
+
+les Résidus Studentisés mesurent combien une observation s'écarte des valeurs attendues en tenant compte de l'échantillon global.
+
+Calculer les résidus studentisés et identifier les résidus extrêmes.
+
+```{r}
+analyses$rstudent <- rstudent(reg_lin)
 seuil_rstudent <- qt(1-alpha/2,n-p-1)
 ```
 
@@ -216,13 +295,38 @@ ggplot(data=analyses, aes(x=obs,y=rstudent))+
   theme_minimal()+
   xlab("Observation")+
   ylab("Résidus studentisés")+
-  scale_x_continuous(breaks=seq(0,n,by=5))
+  scale_x_continuous(breaks=seq(0,n,by=100))
 ```
+
+Nous pouvons également afficher ces observations dans le dataframe initial (data_without_na)
+
+```{r}
+# Crée un vecteur logique True = résidu studentisé au-delà du seuil, sinon False
+idr <- abs(analyses$rstudent) > seuil_rstudent
+# Récupère les indices des lignes où idl est True
+indices_influents_rstudent <- which(idr)
+# Affiche les lignes du DataFrame data_without_na avec ces indices
+data_influents_rstudent <- data_without_na[indices_influents_rstudent, ]
+# Affiche le DataFrame filtré
+summary(data_influents_rstudent)
+```
+
+et nous pouvons aussi observer si ces observations concernent plutôt des "vrais" ou "faux" billets.
+
+```{r}
+table(data_influents_rstudent$is_genuine)
+```
+
+Il s'agit majoritairement de faux billets dans ce cas.
+
+#### c- Distance de Cook
+
+La Distances de Cook est une combinaison des leviers et des résidus studentisés pour quantifier l'impact total d'une observation sur les coefficients du modèle.
 
 Pour récupérer la distance de Cook
 
 ```{r}
-influence<-influence.measures(reg_multi)
+influence<-influence.measures(reg_lin)
 names(influence)
 colnames(influence$infmat)
 ```
@@ -246,70 +350,349 @@ ggplot(data=analyses, aes(x=obs,y=dcook))+
   scale_x_continuous(breaks=seq(0,n,by=5))
 ```
 
+observons de quelles lignes il s'agit dans notre jeu de données
+
+```{r}
+# Crée un vecteur logique True = distance de Cook au-delà du seuil, sinon False
+idc <- analyses$dcook > seuil_dcook
+# Récupère les indices des lignes où idc est True
+indices_influents_cook <- which(idc)
+# Affiche les lignes du DataFrame data_without_na avec ces indices
+data_influents_cook <- data_without_na[indices_influents_cook, ]
+# Affiche le DataFrame filtré
+summary(data_influents_cook)
+```
+
+Combien concernent des vrais et faux billets ?
+
+```{r}
+table(data_influents_cook$is_genuine)
+```
+Il s'agit aussi majoritairement de faux billets.
+
+Dans un modèle de régression linéaire, il est important de vérifer deux aspects : - **la colinéarité** La colinéarité se produit lorsque deux ou plusieurs variables indépendantes dans un modèle de régression sont fortement corrélées, ce qui peut fausser les résultats et rendre difficile l'estimation précise des coefficients.
+
+-   **l'homoscédascticité** L'homoscédasticité signifie que la variance des erreurs (ou résidus) est constante pour toutes les valeurs des variables explicatives. Cela est une hypothèse importante en régression linéaire car si cette hypothèse est violée (c'est-à-dire en cas d'hétéroscédasticité), les coefficients du modèle peuvent être biaisés et inefficaces.
+
+### 4- Test de Non-colinéarité et d'homoscédasticité
+
+Pour valider le modèle de régression linéaire et ces résultats, ces deux aspect doivent donc être respectés.
+
+#### a- Colinéarité
+
 Recherche de colinéarité (commande VIF)
 
 ```{r}
 # Installation du package
 install.packages("car")
-
 # Charger le package
 library(car)
-
-vif(reg_multi)
+vif(reg_lin)
 ```
 
-Tous les VIF étant inférieur à 10, il ne semble pas y avoir de problème de colinéarité
+Tous les VIF étant inférieur à 10, il ne semble pas y avoir de problème de colinéarité\
+Les variables explicatives sont suffisamment indépendantes les unes des autres.
 
 On peut également tester l'homoscédasticité, c'est à dire la constance de la variance des erreurs On peut donc réaliser le test de Breusch-Pagan
+
+#### b- Homoscédasticité
 
 ```{R}
 install.packages("lmtest")
 library(lmtest)
-
-bptest(reg_multi)
+bptest(reg_lin)
 ```
 
-La p-valeur est inférieur à 0.05 et proche de 0 On rejete donc l'hypothèse nulle H0.\
-L'hypothèse nulle de ce test est que les erreurs ont une variance constante, c'est-à-dire que l'hétéroscédasticité n'est pas présente dans les résidus du modèle.\
-En d'autres termes, l'hypothèse nulle affirme que les résidus sont homoscédastiques.
+Hypothèse nulle (H₀) : Les résidus du modèle de régression sont homoscédastiques, c'est-à-dire que la variance des erreurs est constante.
 
-Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante).\
-Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
+Les résultats du test montrent une p-valeur extrêmement faible (p = 7,76e-16), bien inférieure au seuil de 0,05. Par conséquent, nous rejetons l'hypothèse nulle (H₀) et concluons à la présence d'hétéroscédasticité dans le modèle.
 
-La p-value obtenue est extrêmement petite (7.76e-16), bien en dessous du seuil de 0,05, qui est généralement utilisé pour les tests statistiques.
+Cela implique que la variance des erreurs n'est pas constante, ce qui peut fausser les estimations des erreurs standards des coefficients de régression. Par conséquent, la validité des tests d'hypothèses et des intervalles de confiance est compromise, rendant le modèle présenté peu fiable dans sa forme actuelle.
 
-il y a des preuves significatives d'hétéroscédasticité dans le modèle de régression.\
-En d'autres termes, la variance des erreurs n'est pas constante et cela peut biaiser les estimations de l'erreur standard des coefficients de régression, ce qui peut à son tour affecter la validité des tests d'hypothèses et des intervalles de confiance.
+Pour résoudre ce problème, nous allons appliquer des transformations aux variables, notamment en utilisant les méthodes de transformation logarithmique, au carré et inverse. Ces transformations visent à stabiliser la variance des résidus et à réduire l'hétéroscédasticité.
 
-Autre point Pour tester la normalité des résidus, nous pouvons utiliser le test de shapiro
+En effectuant ces transformations sur certaines variables explicatives et/ou sur la variable dépendante, nous espérons obtenir une distribution d'erreurs plus homogène, ce qui rendra les estimations des coefficients de régression plus robustes. Cette approche améliorera ainsi la fiabilité du modèle, tant en termes d'interprétation des coefficients que de validité des tests d'hypothèse.
+
+### 5- Application de Transformations pour Stabiliser la Variance des Résidus
+
+#### a- La transformation logarithmique
 
 ```{r}
-shapiro.test(reg_multi$residuals)
+# Régression linéaire multiple pour prédire la variable margin_low avec transformation lorgarithmique
+reg_lin_log <- lm(log(margin_low)~log(diagonal)+log(height_left)+log(height_right)+log(margin_up)+log(length), data=data_without_na)
+summary(reg_lin_log)
 ```
 
-L'hypothèse de normalité est remise en cause car la p-value est inférieure à 0.05 et proche de 0
-
-Nous aurions pu vouloir sélectionner automatiquement un modèle avec l'ensemble des variables avec le package stat
+Reprenons la ligne du test de prédiction de "margin_low" et contrôlons la valeur obtenue.
 
 ```{r}
-reg_null <- lm(margin_low~1, data=data_without_na)
-reg_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data)
+data[90,]
+```
+
+```{r}
+prev <- data.frame(diagonal=171.94, height_left=103.49, height_right=103.82, margin_up=3.19, length=113.05)
+marg_low_prev_log  <- predict(reg_lin_log, prev)
+marg_low_prev <- exp(marg_low_prev_log)
+round(marg_low_prev,digits=2)
+```
+
+Nous pouvons refaire le test d'homoscédasticité
+
+```{r}
+bptest(reg_lin_log)
+```
+
+Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante). Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
+
+P-value : La p-value obtenue est 4.652e-06, ce qui est extrêmement inférieure au seuil de significativité habituel de 0.05.
+
+Étant donné que la p-value est bien inférieure à 0.05, nous pouvons rejeter l'hypothèse nulle (H0). Cela indique qu'il reste des preuves significatives d'hétéroscédasticité dans le modèle.
+
+#### b- La transformation quadratique (Racine Carré)
+
+```{r}
+reg_lin_sqrt <- lm(sqrt(margin_low) ~ sqrt(diagonal) + sqrt(height_left) + sqrt(height_right) + sqrt(margin_up) + sqrt(length), data=data_without_na)
+summary(reg_lin_sqrt)
+
+```
+
+```{r}
+prev <- data.frame(diagonal=171.94, height_left=103.49, height_right=103.82, margin_up=3.19, length=113.05)
+marg_low_prev_sqrt  <- predict(reg_lin_sqrt, prev)
+marg_low_prev <- marg_low_prev_sqrt^2
+round(marg_low_prev,digits=2)
+```
+
+```{r}
+bptest(reg_lin_sqrt)
+```
+
+Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante). Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
+
+P-value : La p-value obtenue est 7.978e-11, ce qui est extrêmement inférieure au seuil de significativité habituel de 0.05.
+
+Étant donné que la p-value est bien inférieure à 0.05, vous pouvez rejeter l'hypothèse nulle (H0). Cela indique qu'il y a des preuves significatives d'hétéroscédasticité dans les résidus de votre modèle, même après avoir appliqué la transformation racine carrée.
+
+#### c- La transformation Inverse
+
+```{r}
+# Ajuster le modèle avec la transformation inverse sur la variable dépendante
+reg_lin_inverse <- lm(I(1 / margin_low) ~ diagonal + height_left + height_right + margin_up + length, data = data_without_na)
+summary(reg_lin_inverse)
+
+```
+
+```{r}
+prev <- data.frame(diagonal=171.94, height_left=103.49, height_right=103.82, margin_up=3.19, length=113.05)
+marg_low_prev_inverse  <- predict(reg_lin_inverse, prev)
+marg_low_prev <- 1 /marg_low_prev_inverse
+round(marg_low_prev,digits=2)
+```
+
+```{r}
+bptest(reg_lin_inverse)
+```
+
+Hypothèse du Test Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante). Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
+
+p-value : La p-value obtenue est de 0.4773.
+
+Comme la p-value est bien supérieure au seuil de signification de 0.05, on ne rejete pas l'hypothèse nulle. Cela indique qu'il n'y a pas suffisamment de preuves pour conclure qu'il existe une hétéroscédasticité significative dans les résidus du modèle où seule la variable dépendante a été transformée par l'inverse.
+
+Avec cette méthode nous pouvons utiliser la régréssion linéaire pour prédire margin_low, la non-colinéarité et l'homoscédacité sont réspectée.
+
+Nous pouvons également tester la régréssion linéaire multiple en séparant le jeu de données en 2, données "True" et données "False" et tester la performance.
+
+#### d- Régression linéaire en séparant "True" et "False"
+
+Nous pouvons également tester la régréssion linéaire multiple en séparant le jeu de données en 2, données "True" et données "False" et tester la performance.
+
+##### Données "True"
+```{r}
+data_without_na_true <- data_without_na[data_without_na$is_genuine == "True", ]
+data_without_na_true
+```
+
+```{r}
+# Régression linéaire multiple pour prédire la variable margin_low
+reg_lin_true <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_true)
+summary(reg_lin_true)
+```
+
+Seule la variable "margin_up" semble avoir une influence relative sur "margin_low" bien qu'elle ne soit pas concluante avec un niveau de signification de 0.05.
+Les autres variables n'ont pas d'influence significative.
+
+Méthode de sélection automatique des variables
+
+```{r}
+reg_true_null <- lm(margin_low~1, data=data_without_na_true)
+reg_true_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_true)
 ```
 
 ```{r}
 #Méthode backward
-reg_backward <- step(reg_tot, direction="backward")
+reg_true_backward <- step(reg_true_tot, direction="backward")
 ```
 
-Le résultat nous montre que toutes les variables explicatives sont importantes dans le modèle pour prédire margin_low. la suppression de length à l'impact le plus négatif sur le modèle augmentant considérablement le RSS (somme des carrés des résidus) chaque suppression rend le modèle moins performant. Le modèle final sera le modèle complet
+Échantillonnage des Données pour Validation Croisée : Ensembles d'Entraînement et de Test
+```{r}
+set.seed(142)  # Pour rendre les résultats reproductibles
 
-ANCIENNE PARTIE A REVOIR
+# Définir la proportion pour l'ensemble de test
+test_proportion <- 0.2
+
+# Calculer le nombre d'observations pour l'ensemble de test
+total_rows <- nrow(data_without_na_true)
+test_size <- round(test_proportion * total_rows)
+
+# Créer un échantillon aléatoire d'indices pour l'ensemble de test
+test_indices <- sample(1:total_rows, test_size)
+
+# Créer les ensembles de test et d'entraînement
+test_data <- data_without_na_true[test_indices, ]
+train_data <- data_without_na_true[-test_indices, ]
+```
+
+```{r}
+# Entraîner le modèle avec les données d'entraînement
+reg_true_final <- lm(margin_low ~ margin_up, data = train_data)
+summary(reg_true_final)
+```
+
+```{r}
+# Prédictions avec le modèle sur les données de test
+predictions <- predict(reg_true_final, test_data)
+```
+
+```{r}
+# Calculer les valeurs réelles de margin_low dans l'ensemble de test
+actual_values <- test_data$margin_low
+
+# Calculer les erreurs
+error <- abs(predictions - actual_values)
+rmse <- sqrt(mean((predictions - actual_values)^2))
+mae <- mean(error)
+
+# Afficher les résultats
+print(rmse)
+print(mae)
+```
+RMSE indique la racine carrée de la moyenne des carrés des erreurs
+MAE mesure la moyenne des valeurs absolues des erreurs de prédiction.
+
+Nous pouvons visualiser les résultats à l'aide d'un nuage de points.
+```{r}
+library(ggplot2)
+
+results <- data.frame(
+  margin_up = test_data$margin_up,
+  Predicted_margin_low = predictions,
+  Actual_margin_low = actual_values
+)
+
+# Visualiser les résultats
+ggplot(results, aes(x = margin_up)) +
+  geom_point(aes(y = Predicted_margin_low, color = "Prédictions")) +
+  geom_point(aes(y = Actual_margin_low, color = "Réels")) +
+  labs(y = "margin_low", color = "Type") +
+  theme_minimal()
+```
+En rouge nous voyons les prédictions issues de la régression linéaire et en bleu les valeurs réels.
+
+##### Donéées "False"
+
+```{r}
+data_without_na_false <- data_without_na[data_without_na$is_genuine == "False", ]
+data_without_na_false
+```
+
+```{r}
+# Régression linéaire multiple pour prédire la variable margin_low
+reg_multi_false <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_false)
+summary(reg_multi_false)
+```
+
+```{r}
+reg_false_null <- lm(margin_low~1, data=data_without_na_false)
+reg_false_tot <- lm(margin_low~diagonal+height_left+height_right+margin_up+length, data=data_without_na_false)
+```
+
+```{r}
+#Méthode backward
+reg_false_backward <- step(reg_false_tot, direction="backward")
+```
+
+```{r}
+set.seed(123)  # Pour rendre les résultats reproductibles
+
+# Définir la proportion pour l'ensemble de test
+test_proportion <- 0.2
+
+# Calculer le nombre d'observations pour l'ensemble de test
+total_rows <- nrow(data_without_na_false)
+test_size <- round(test_proportion * total_rows)
+
+# Créer un échantillon aléatoire d'indices pour l'ensemble de test
+test_indices <- sample(1:total_rows, test_size)
+
+# Créer les ensembles de test et d'entraînement
+test_data <- data_without_na_false[test_indices, ]
+train_data <- data_without_na_false[-test_indices, ]
+```
+
+```{r}
+# Entraîner le modèle avec les données d'entraînement
+reg_multi_final <- lm(margin_low ~ margin_up, data = train_data)
+summary(reg_multi_final)
+```
+
+```{r}
+# Prédictions avec le modèle sur les données de test
+predictions <- predict(reg_multi_final, test_data)
+```
+
+```{r}
+# Calculer les valeurs réelles de margin_low dans l'ensemble de test
+actual_values <- test_data$margin_low
+
+# Calculer les erreurs
+error <- abs(predictions - actual_values)
+rmse <- sqrt(mean((predictions - actual_values)^2))
+mae <- mean(error)
+
+# Afficher les résultats
+print(rmse)
+print(mae)
+```
+
+```{r}
+library(ggplot2)
+
+results <- data.frame(
+  margin_up = test_data$margin_up,
+  Predicted_margin_low = predictions,
+  Actual_margin_low = actual_values
+)
+
+# Visualiser les résultats
+ggplot(results, aes(x = margin_up)) +
+  geom_point(aes(y = Predicted_margin_low, color = "Prédictions")) +
+  geom_point(aes(y = Actual_margin_low, color = "Réels")) +
+  labs(y = "margin_low", color = "Type") +
+  theme_minimal()
+```
+
+Ce dernier modèle en séparant les data "True" et "False" semble avoir une capacité prédictive limitée. Ce ne sera pas ce modèle que nous conserverons.
+
+Nous allons utiliser la régression linéaire, en appliquant une transformation inverse à la variable dépendante, afin de garantir la non-colinéarité et l'homoscédasticité des résidus. La non-colinéarité permet d'éviter la redondance entre les variables explicatives, assurant ainsi des estimations fiables des coefficients, tandis que l'homoscédasticité garantit que la variance des résidus reste constante, condition essentielle pour des tests statistiques valides et des intervalles de confiance précis.
+
 
 ## V- Remplacement des données manquantes
 
 ```{r}
 # Prédire les valeurs manquantes
-predicted_values <- predict(reg_multi, newdata = missing_margin_low)
+predicted_values_inverse <- predict(reg_lin_inverse, newdata = missing_margin_low)
+predicted_values <- 1/predicted_values_inverse
 ```
 
 ```{r}
@@ -339,21 +722,33 @@ print(lignes_data)
 
 ```
 
+Puis on contrôle qu'il n'y a plus de valeur manquante dans "data"
 ```{r}
 skim(data)
 ```
 
+
+### Analyse des résidus de la régression logistique sur l'ensemble de "data"
+
+Nous pouvons visualiser les résidus à l'échelle originale sur l'ensemble du dataframe
 ```{r}
-# Obtenir les résidus du modèle
-residus <- residuals(reg_multi)
+predicted_values_inv_data <- predict(reg_lin_inverse, newdata = data)
+predicted_values_original_data <- 1 / predicted_values_inv_data
+residus_original <- data$margin_low - predicted_values_original_data
 
-# Résumé des résidus
-summary(residus)
+# Résumé des résidus dans l'échelle originale
+summary(residus_original)
 
-# Visualiser les résidus
-hist(residus, main="Distribution des résidus", xlab="Résidus")
+# Visualiser les résidus dans l'échelle originale
+hist(residus_original, main = "Distribution des résidus (échelle originale)", xlab = "Résidus")
 
+# Q-Q Plot des résidus pour vérifier la normalité
+qqnorm(residus_original, main = "Q-Q Plot des Résidus")
+qqline(residus_original, col = "red")
 ```
+
+Les résidus montrent une distribution qui est globalement normale et symétrique autour de zéro, ce qui est un bon indicateur que les hypothèses de normalité sont respectées. L'histogramme des résidus présente une forme de cloche, et le Q-Q plot confirme que les résidus se rapprochent d'une distribution normale même si on peut observer un détachement en queue par rapport à la normale.
+
 
 ------------------------------------------------------------------------
 
@@ -1233,7 +1628,6 @@ model_random_forest_accuracy <- cm_random_forest$overall["Accuracy"]
 model_random_forest_accuracy
 ```
 
-
 Essayons avec la méthode de Réseau Neuronal
 
 ```{r}
@@ -1335,7 +1729,6 @@ model_neuronal_2 %>% compile(
 )
 
 ```
-
 
 ```{r}
 # Évaluer le modèle
@@ -1511,11 +1904,12 @@ cm_reseau_neuronal
 ```
 
 COMPARAISON DES PERFORMANCES ENTRE LES MODELES
+
 ```{r}
 model_neuronal_accuracy <- cm_reseau_neuronal$overall["Accuracy"]
 model_neuronal_accuracy
-```
 
+```
 
 Sauvegarde du modèle à utiliser
 
@@ -1530,4 +1924,3 @@ model_neuronal_4 %>% save_model_hdf5("model_faux_billets.h5")
 saveRDS(reg_log_model, "modele_regression_logistique.rds")
 saveRDS(best_threshold, "seuil_optimal.rds")
 ```
-
