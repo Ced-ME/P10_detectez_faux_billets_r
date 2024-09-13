@@ -1,6 +1,6 @@
 "id","is_genuine","proba"
-"B_1","True",100
-"B_2","False",4.14
-"B_3","True",100
-"B_4","False",0.56
-"B_5","False",25.19
+"B_1","True",99.99
+"B_2","False",1.83
+"B_3","True",99.99
+"B_4","False",0.18
+"B_5","False",9.23
