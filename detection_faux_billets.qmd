@@ -11,18 +11,21 @@ options(repos = c(CRAN = "https://cran.rstudio.com/"))
 ```
 
 ### a- Modèle de régression Logistique
+
 ```{r}
 # Charger le modèle ajusté et le seuil optimal
 reg_log_model <- readRDS("modele_regression_logistique.rds")
 best_threshold <- readRDS("seuil_optimal.rds")
 ```
+
 ```{r}
 best_threshold
 ```
-Le Seuil optimal offrant la meilleur spécificité, c'est à dire le moins de risque de faux positifs était 
-0.97 dans notre modèle.
+
+Le Seuil optimal offrant la meilleur spécificité, c'est à dire le moins de risque de faux positifs était 0.97 dans notre modèle.
 
 ### b- Modèle de réseau neuronal
+
 ```{r}
 # Utilisez le nouvel environnement Conda
 library(reticulate)
@@ -42,7 +45,7 @@ rn_model <- load_model_hdf5("model_faux_billets.h5")
 ## 2- Chargement des datas
 
 ```{r}
-data <- read.csv("data_raw/billets_test (4).csv", sep =",")
+data <- read.csv("data_raw/billets_production.csv", sep =",")
 ```
 
 ## 3- Contrôle et préparation des datas
@@ -64,6 +67,7 @@ new_data <- data[, -which(names(data) == "id")]
 ```
 
 ## 4- Application du modèle de régression logistique sur le jeu de données
+
 ```{r}
 # Faire des prédictions de probabilités sur de nouvelles données
 predicted_prob <- predict(reg_log_model, new_data, type = "response")
@@ -85,7 +89,7 @@ table(predictions)
 
 ```{r}
 # Association des identifiants de billets avec les prédictions
-resultat <- data.frame(id = ids, is_genuine = predictions, proba = round(predicted_prob*100,2))
+resultat <- data.frame(id = ids, is_genuine = predictions, proba = round(predicted_prob*100,3))
 
 print(resultat)
 ```
@@ -110,10 +114,9 @@ print(classe)
 
 ```
 
-
 ```{r}
 # Associer les identifiants de billets avec les prédictions
-resultat_rn <- data.frame(id = ids, is_genuine = classe, proba = round(rn_pred*100,2))
+resultat_rn <- data.frame(id = ids, is_genuine = classe, proba = round(rn_pred*100,3))
 
 print(resultat_rn)
 
@@ -127,9 +130,3 @@ tableau_recap <- merge(resultat, resultat_rn, by = "id", suffixes = c("_regressi
 print(tableau_recap)
 
 ```
-
-On observe dans ce tableau récapitulatif que les prédictions sont identiques pour is_genuine c'est à dire pour la détection de faux ou vrai pour ce jeu de données.  
-
-Cependant on observe également une différence de certitude entre les deux modèles :  
-- Le modèle de régression semble avoir plus de certitude avec des probabilités proches de 0 pour les faux, et proches de 100 pour les vrais.  
-- Le modèle de réseau neuronal semble lui plus nuancer, B_1 est moins proche de 0 et B_5 a 76.55% d'être vrai.  

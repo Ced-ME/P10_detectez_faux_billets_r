@@ -250,6 +250,8 @@ ggplot(data=analyses, aes(x=obs,y=levier))+
   scale_x_continuous(breaks=seq(0,n,by=100))
 ```
 
+Les points avec des leviers élevés ont une grande capacité à influencer la ligne de régression.
+
 Ensuite nous pourrions identifier les observations pour lesquelles les leviers sont supérieurs au seuil défini
 
 ```{r}
@@ -301,6 +303,8 @@ ggplot(data=analyses, aes(x=obs,y=rstudent))+
   ylab("Résidus studentisés")+
   scale_x_continuous(breaks=seq(0,n,by=100))
 ```
+
+La normalisation des résidus permet ici d'identifier les observations qui s'écartent significativement des valeurs prédites. Aide à détecter les points atypiques.
 
 Nous pouvons également afficher ces observations dans le dataframe initial (data_without_na)
 
@@ -375,7 +379,8 @@ table(data_influents_cook$is_genuine)
 
 Il s'agit aussi majoritairement de faux billets.
 
-Dans un modèle de régression linéaire, il est important de vérifer deux aspects : - **la colinéarité** La colinéarité se produit lorsque deux ou plusieurs variables indépendantes dans un modèle de régression sont fortement corrélées, ce qui peut fausser les résultats et rendre difficile l'estimation précise des coefficients.
+Dans un modèle de régression linéaire, il est important de vérifer deux aspects :\
+- **la colinéarité** La colinéarité se produit lorsque deux ou plusieurs variables indépendantes dans un modèle de régression sont fortement corrélées, ce qui peut fausser les résultats et rendre difficile l'estimation précise des coefficients.
 
 -   **l'homoscédascticité** L'homoscédasticité signifie que la variance des erreurs (ou résidus) est constante pour toutes les valeurs des variables explicatives. Cela est une hypothèse importante en régression linéaire car si cette hypothèse est violée (c'est-à-dire en cas d'hétéroscédasticité), les coefficients du modèle peuvent être biaisés et inefficaces.
 
@@ -398,7 +403,9 @@ vif(reg_lin)
 Tous les VIF étant inférieur à 10, il ne semble pas y avoir de problème de colinéarité\
 Les variables explicatives sont suffisamment indépendantes les unes des autres.
 
-On peut également tester l'homoscédasticité, c'est à dire la constance de la variance des erreurs On peut donc réaliser le test de Breusch-Pagan
+On peut également tester l'homoscédasticité, c'est à dire la constance de la variance des erreurs.
+
+On peut donc réaliser le test de Breusch-Pagan
 
 #### b- Homoscédasticité
 
@@ -408,9 +415,9 @@ library(lmtest)
 bptest(reg_lin)
 ```
 
-Hypothèse nulle (H₀) : Les résidus du modèle de régression sont homoscédastiques, c'est-à-dire que la variance des erreurs est constante.
+Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques, c'est-à-dire que la variance des erreurs est constante.
 
-Les résultats du test montrent une p-valeur extrêmement faible (p = 7,76e-16), bien inférieure au seuil de 0,05. Par conséquent, nous rejetons l'hypothèse nulle (H₀) et concluons à la présence d'hétéroscédasticité dans le modèle.
+Les résultats du test montrent une p-valeur extrêmement faible (p = 7,76e-16), bien inférieure au seuil de 0,05. Par conséquent, nous rejetons l'hypothèse nulle (H0) et concluons à la présence d'hétéroscédasticité dans le modèle.
 
 Cela implique que la variance des erreurs n'est pas constante, ce qui peut fausser les estimations des erreurs standards des coefficients de régression. Par conséquent, la validité des tests d'hypothèses et des intervalles de confiance est compromise, rendant le modèle présenté peu fiable dans sa forme actuelle.
 
@@ -447,7 +454,8 @@ Nous pouvons refaire le test d'homoscédasticité
 bptest(reg_lin_log)
 ```
 
-Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante). Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
+Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante).\
+Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
 
 P-value : La p-value obtenue est 4.652e-06, ce qui est extrêmement inférieure au seuil de significativité habituel de 0.05.
 
@@ -472,7 +480,8 @@ round(marg_low_prev,digits=2)
 bptest(reg_lin_sqrt)
 ```
 
-Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante). Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
+Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante).\
+Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
 
 P-value : La p-value obtenue est 7.978e-11, ce qui est extrêmement inférieure au seuil de significativité habituel de 0.05.
 
@@ -498,7 +507,8 @@ round(marg_low_prev,digits=2)
 bptest(reg_lin_inverse)
 ```
 
-Hypothèse du Test Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante). Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
+Hypothèse du Test Hypothèse nulle (H0) : Les résidus du modèle de régression sont homoscédastiques (la variance des erreurs est constante).\
+Hypothèse alternative (H1) : Les résidus du modèle de régression ne sont pas homoscédastiques (il y a de l'hétéroscédasticité).
 
 p-value : La p-value obtenue est de 0.4773.
 
@@ -547,7 +557,7 @@ Puis on contrôle qu'il n'y a plus de valeur manquante dans "data"
 skim(data)
 ```
 
-### Analyse des résidus de la régression logistique sur l'ensemble de "data"
+### Analyse des résidus de la régression linéaire sur l'ensemble de "data"
 
 Nous pouvons visualiser les résidus à l'échelle originale sur l'ensemble du dataframe
 
@@ -861,12 +871,14 @@ Dim1 (43.3%) : Cet axe explique 43.3% de la variance totale des données.\
 Dim2 (17%) : Cet axe explique 17% de la variance totale des données.
 
 Dim1 On observe :\
-- une forte contribution positibe de la marge basse (margin_low)\
+- une forte contribution positive de la marge basse (margin_low)\
 - une forte contribution négative de la longueur (length)\
 une forte valeur de Dim1 indiquera un longueur de billet faible avec une marge basse élevée
 
 Dim2 On observe :\
-- une forte contribution positibe de la diagonale Une forte valeur de Dim2 indiquera une valeur de diagonale élevée
+- une forte contribution positive de la diagonale
+
+Une forte valeur de Dim2 indiquera une valeur de diagonale élevée
 
 ```{r}
 # Extraire les scores des individus
@@ -1776,7 +1788,7 @@ cat("F1 Score:", f1_score_neurone_4, "\n")
 
 ```
 
-COMPARAISON DES PERFORMANCES ENTRE LES MODELES
+## VIII- Comparaison des performances entre les modèles
 
 ```{r}
 # Installer et charger le package tibble pour une meilleure gestion des tableaux (si ce n'est pas déjà fait)
@@ -1803,7 +1815,10 @@ print(results)
 
 ```
 
-Accuracy : Taux global de prédiction correcte. Specificity : Capacité à identifier les véritables négatifs. Sensitivity : Capacité à identifier les véritables positifs. F1 Score : Moyenne harmonique de la précision et du rappel, utile pour évaluer la performance dans des contextes déséquilibrés.
+Accuracy : Taux global de prédiction correcte.\
+Specificity : Capacité à identifier les véritables négatifs.\
+Sensitivity : Capacité à identifier les véritables positifs.\
+F1 Score : Moyenne harmonique de la précision et du rappel, utile pour évaluer la performance dans des contextes déséquilibrés.
 
 ```{r}
 library(ggplot2)
@@ -1820,7 +1835,9 @@ ggplot(results_long, aes(x = Model, y = Value, fill = Metric)) +
 
 ```
 
-Sauvegarde du modèle à utiliser Modèle réseau neuronal 4
+## IX- Sauvegarde des modèles
+
+### 1- Sauvegarde du modèle à utiliser Modèle réseau neuronal 4
 
 ```{r}
 # Sauvegarder le modèle neuronales (librairie keras)
@@ -1828,7 +1845,9 @@ model_neuronal_ameliore %>% save_model_hdf5("model_faux_billets.h5")
 
 ```
 
-Modèle régréssion logistique opti il correspond à rl_model_1 avec application du seuil optimal
+### 2- Sauvegarde du Modèle régréssion logistique
+
+Modèle régréssion logistique opti correspond à rl_model_1 avec application du seuil optimal
 
 ```{r}
 # Sauvegarder le modèle et le seuil
