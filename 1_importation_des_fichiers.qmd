@@ -1508,8 +1508,8 @@ df_normalized <- data %>%
   mutate(across(c(diagonal, height_left, height_right, margin_low, margin_up, length), scale))
 
 # Diviser les données en ensembles d'entraînement et de test
-set.seed(52)  # Pour la reproductibilité
-train_indices <- sample(1:nrow(df_normalized), 0.8 * nrow(df_normalized))
+set.seed(75)  # Pour la reproductibilité
+train_indices <- sample(1:nrow(df_normalized), 0.5 * nrow(df_normalized))
 train_data <- df_normalized[train_indices, ]
 test_data <- df_normalized[-train_indices, ]
 
@@ -1539,11 +1539,11 @@ model_neuronal_1 %>% compile(
   metrics = c('accuracy')
 )
 # Évaluer le modèle
-score1 <- model_neuronal_1 %>% evaluate(x_test, y_test, positive ="1")
+score1 <- model_neuronal_1 %>% evaluate(x_test, y_test)
 print(score1)
 ```
 
-Le modèle 1 est assez simple et n'inclut aucune forme de régularisation. Il pourrait avoir un certain degré de surajustement (overfitting) ou de sous-ajustement (underfitting), mais la précision de 70 % montre qu'il capture une partie des relations dans les données. La perte est relativement élevée, indiquant que le modèle pourrait être amélioré.
+Le modèle 1 est assez simple et n'inclut aucune forme de régularisation. Il pourrait avoir un certain degré de surajustement (overfitting) ou de sous-ajustement (underfitting), mais la précision de 79.6% montre qu'il capture une partie des relations dans les données. La perte est relativement élevée, indiquant que le modèle pourrait être amélioré.
 
 ```{r}
 # Faire des prédictions sur les données de test
@@ -1581,9 +1581,9 @@ Modèle 2 Ajout de dropout pour régularisation et taille de couche plus élevé
 # Créer le modèle
 model_neuronal_2 <- keras_model_sequential() %>%
   layer_dense(units = 64, activation = 'relu', input_shape = c(ncol(x_train))) %>%
-  layer_dropout(rate = 0.5) %>%
+  layer_dropout(rate = 0.2) %>%
   layer_dense(units = 32, activation = 'relu') %>%
-  layer_dropout(rate = 0.5) %>%
+  layer_dropout(rate = 0.2) %>%
   layer_dense(units = 16, activation = 'relu') %>%
   layer_dense(units = 1, activation = 'sigmoid')
 # Compiler le modèle
@@ -1786,6 +1786,8 @@ cat("Specificity:", specificity_neurone_4, "\n")
 cat("Sensitivity:", sensitivity_neurone_4, "\n")
 cat("F1 Score:", f1_score_neurone_4, "\n")
 
+
+
 ```
 
 ## VIII- Comparaison des performances entre les modèles
@@ -1837,15 +1839,7 @@ ggplot(results_long, aes(x = Model, y = Value, fill = Metric)) +
 
 ## IX- Sauvegarde des modèles
 
-### 1- Sauvegarde du modèle à utiliser Modèle réseau neuronal 4
-
-```{r}
-# Sauvegarder le modèle neuronales (librairie keras)
-model_neuronal_ameliore %>% save_model_hdf5("model_faux_billets.h5")
-
-```
-
-### 2- Sauvegarde du Modèle régréssion logistique
+### 1- Sauvegarde du Modèle régréssion logistique
 
 Modèle régréssion logistique opti correspond à rl_model_1 avec application du seuil optimal
 
@@ -1854,3 +1848,13 @@ Modèle régréssion logistique opti correspond à rl_model_1 avec application d
 saveRDS(rl_model_1, "modele_regression_logistique.rds")
 saveRDS(best_threshold, "seuil_optimal.rds")
 ```
+
+
+### 2- Sauvegarde du modèle à utiliser Modèle réseau neuronal 4
+
+```{r}
+# Sauvegarder le modèle neuronales (librairie keras)
+model_neuronal_ameliore %>% save_model_hdf5("model_reseau_neuronal.h5")
+
+```
+

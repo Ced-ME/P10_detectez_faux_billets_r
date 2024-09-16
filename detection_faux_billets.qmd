@@ -4,7 +4,7 @@ format: pdf
 editor: visual
 ---
 
-## 1- Chargement des modèles de prédictions
+## 1- Chargement du modèle de prédictions
 
 ```{r}
 options(repos = c(CRAN = "https://cran.rstudio.com/"))
@@ -24,28 +24,10 @@ best_threshold
 
 Le Seuil optimal offrant la meilleur spécificité, c'est à dire le moins de risque de faux positifs était 0.97 dans notre modèle.
 
-### b- Modèle de réseau neuronal
-
-```{r}
-# Utilisez le nouvel environnement Conda
-library(reticulate)
-
-# Utilisez le nouvel environnement Conda
-use_condaenv("tf-env", required = TRUE)
-
-library(keras)
-```
-
-```{r}
-# Charger le modèle sauvegardé (réseau neuronal)
-rn_model <- load_model_hdf5("model_faux_billets.h5")
-
-```
-
 ## 2- Chargement des datas
 
 ```{r}
-data <- read.csv("data_raw/billets_production.csv", sep =",")
+data <- read.csv("data_raw/billets_test (4).csv", sep =",")
 ```
 
 ## 3- Contrôle et préparation des datas
@@ -89,44 +71,7 @@ table(predictions)
 
 ```{r}
 # Association des identifiants de billets avec les prédictions
-resultat <- data.frame(id = ids, is_genuine = predictions, proba = round(predicted_prob*100,3))
+resultat <- data.frame(id = ids, is_genuine = predictions, proba = round(predicted_prob*100,5))
 
 print(resultat)
-```
-
-## 5- Application du modèle de réseau neuronal sur le jeu de données
-
-Normalisation des données avant application du modèle
-
-```{r}
-new_data_scaled <- scale(new_data)
-```
-
-```{r}
-# Faire des prédictions sur le nouveau jeu de données
-rn_pred <- rn_model %>% predict(new_data_scaled)
-
-# Convertir les probabilités en classes (0 ou 1)
-classe <- ifelse(rn_pred > 0.95, "True", "False")
-
-# Afficher les résultats
-print(classe)
-
-```
-
-```{r}
-# Associer les identifiants de billets avec les prédictions
-resultat_rn <- data.frame(id = ids, is_genuine = classe, proba = round(rn_pred*100,3))
-
-print(resultat_rn)
-
-```
-
-```{r}
-# Fusionner les deux tableaux en fonction de l'ID commun
-tableau_recap <- merge(resultat, resultat_rn, by = "id", suffixes = c("_regression", "_rn"))
-
-# Afficher le tableau récapitulatif
-print(tableau_recap)
-
 ```
