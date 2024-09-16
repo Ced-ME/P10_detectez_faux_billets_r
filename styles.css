@@ -1,0 +1,4 @@
+.main-container {
+  max-width: 90%; /* Ajustez la largeur à 90% de l'écran */
+  margin: 0 auto; /* Centre le contenu */
+}

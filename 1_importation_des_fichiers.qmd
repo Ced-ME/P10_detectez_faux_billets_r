@@ -3,6 +3,7 @@ title: "Détecter des faux billets"
 author: "CME"
 format: pdf
 editor: visual
+css: styles.css
 ---
 
 ## I- Contexte
@@ -109,10 +110,10 @@ text(x = cos(2 * pi * positions / sum(valeur_compte)) * 0.5,
 
 ### En résumé
 
-**Nous avons un tableau regroupant les données de 1 500 billets**\
+**Nous avons un tableau regroupant les données de 1 500 billets**
 
 **1 colonne décrivant s'il s'agit de vrais ou faux billets :**\
-- il y a 1 000 vrais billets 66.7% et 500 faux billets 33.3%\
+- il y a 1 000 vrais billets 66.7% et 500 faux billets 33.3%
 
 **6 colonne décrivants le format de ces billets :**\
 - diagonale\
@@ -120,7 +121,7 @@ text(x = cos(2 * pi * positions / sum(valeur_compte)) * 0.5,
 - hauteur droite\
 - marge basse\
 - marge haute\
-- longueur\
+- longueur
 
 ***37 billets*** n'ont pas l'information de la marge basse ("margin_low") dans le tableau.
 
@@ -145,6 +146,7 @@ Il y a bien quelques différences de mesures entre les vrais et faux billets mai
 
 ## V- Remlacement des NaN de la colonne "margin_low"
 
+::: {style="text-align: justify;"}
 Pour commencer il est nécessaire de traiter les valeurs manquantes de notre jeu de données.
 
 Nous avons la possibilité de retirer ces 37 lignes ou bien de déterminer les valeurs manquantes de la colonne "margin_low" en fonction des autres variables présentes à l'aide d'une régréssion linéaire.
@@ -152,6 +154,7 @@ Nous avons la possibilité de retirer ces 37 lignes ou bien de déterminer les v
 Regréssion linéaire multiple : Nous utilisons toutes les variables pour commencer et nous allons voir si elles sont toutes significatives pour la détermination de "margin_low". Nous fixons notre seuil de test à 5% Toutes les p-valeur inférieure à 0.05 seront donc considérée comme significatives. Si toutes les variables ne sont pas significatives, nous utiliserons la méthode backward et retirerons une à une toutes les variables non significatives.
 
 Pour réaliser notre modèle de régression linéaire, nous allons travailler sur notre jeu de données sans NA
+:::
 
 ### 1- Régréssion linéaire
 
