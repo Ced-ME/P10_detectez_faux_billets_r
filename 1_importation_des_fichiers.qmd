@@ -7,9 +7,10 @@ editor: visual
 
 ## I- Contexte
 
+::: {style="text-align: justify;"}
 Vous êtes consultant Data Analyst dans une entreprise spécialisée dans la data. Votre entreprise a décroché une prestation en régie au sein de l’**Organisation nationale de lutte contre le faux-monnayage (ONCFM)**.
 
-![](img/logo_oncfm.png)
+<img src="img/logo_oncfm.png" style="display: block; margin-left: auto; margin-right: auto; width: 100%;"/> 
 
 Cette institution a pour objectif de mettre en place des méthodes d’identification des contrefaçons des billets en euros. Ils font donc appel à vous, spécialiste de la data, pour mettre en place une modélisation qui serait capable d’identifier automatiquement les vrais des faux billets. Et ce à partir simplement de certaines dimensions du billet et des éléments qui le composent.
 
@@ -18,6 +19,7 @@ Voici le [cahier des charges de l’ONCFM](doc/cahier_des_charges.pdf) ainsi que
 Le client souhaite que vous travailliez directement depuis ses locaux sous la responsabilité de Marie, responsable du projet d’analyse de données à l’ONCFM. Elle vous laissera une grande autonomie pendant votre mission, et vous demande simplement que vous lui présentiez vos résultats une fois la mission terminée. Elle souhaite voir quels sont les traitements et analyses que vous avez réalisés en amont, les différentes pistes explorées pour la construction de l’algorithme, ainsi que le modèle final retenu.
 
 Après avoir lu en détail le cahier des charges, vous vous préparez à vous rendre à l’ONCFM pour prendre vos nouvelles fonctions. Vous notez tout de même un post-it qui se trouve sur le coin de votre bureau, laissé par un de vos collègues :
+:::
 
 ## II- Importation des fichiers
 
@@ -167,7 +169,6 @@ summary(reg_lin)
 Les variables sont toutes significatives car leur p-value est inférieure à 5% (0.05) le niveau de test que nous souhaitons. Nous conservons donc toutes les variables pour la détermination de 'margin_low'
 
 Nous aurions pu vouloir sélectionner automatiquement un modèle avec l'ensemble des variables avec le package stat
-
 
 ```{r}
 reg_null <- lm(margin_low~1, data=data_without_na)
@@ -368,6 +369,7 @@ Combien concernent des vrais et faux billets ?
 ```{r}
 table(data_influents_cook$is_genuine)
 ```
+
 Il s'agit aussi majoritairement de faux billets.
 
 Dans un modèle de régression linéaire, il est important de vérifer deux aspects : - **la colinéarité** La colinéarité se produit lorsque deux ou plusieurs variables indépendantes dans un modèle de régression sont fortement corrélées, ce qui peut fausser les résultats et rendre difficile l'estimation précise des coefficients.
@@ -499,9 +501,7 @@ p-value : La p-value obtenue est de 0.4773.
 
 Comme la p-value est bien supérieure au seuil de signification de 0.05, on ne rejete pas l'hypothèse nulle. Cela indique qu'il n'y a pas suffisamment de preuves pour conclure qu'il existe une hétéroscédasticité significative dans les résidus du modèle où seule la variable dépendante a été transformée par l'inverse.
 
-
 Nous allons utiliser la régression linéaire, en appliquant une transformation inverse à la variable dépendante, afin de garantir la non-colinéarité et l'homoscédasticité des résidus. La non-colinéarité permet d'éviter la redondance entre les variables explicatives, assurant ainsi des estimations fiables des coefficients, tandis que l'homoscédasticité garantit que la variance des résidus reste constante, condition essentielle pour des tests statistiques valides et des intervalles de confiance précis.
-
 
 ## V- Remplacement des données manquantes
 
@@ -539,14 +539,15 @@ print(lignes_data)
 ```
 
 Puis on contrôle qu'il n'y a plus de valeur manquante dans "data"
+
 ```{r}
 skim(data)
 ```
 
-
 ### Analyse des résidus de la régression logistique sur l'ensemble de "data"
 
 Nous pouvons visualiser les résidus à l'échelle originale sur l'ensemble du dataframe
+
 ```{r}
 predicted_values_inv_data <- predict(reg_lin_inverse, newdata = data)
 predicted_values_original_data <- 1 / predicted_values_inv_data
@@ -565,16 +566,16 @@ qqline(residus_original, col = "red")
 
 Les résidus montrent une distribution qui est globalement normale et symétrique autour de zéro, ce qui est un bon indicateur que les hypothèses de normalité sont respectées. L'histogramme des résidus présente une forme de cloche, et le Q-Q plot confirme que les résidus se rapprochent d'une distribution normale même si on peut observer un détachement en queue par rapport à la normale.
 
-
 ------------------------------------------------------------------------
 
 ## VI- ACP et Clustering
 
-Nous allons désormais réaliser une analyse exploratoire des regroupements possible de billets à l'aide de la méthode des K-means qui est une méthode non supervisée et qui nous donnera un aperçu du regroupement naturel des billets en fonction de leurs mesures sans tenir compte de l'information "vrai" et "faux" de "is_genuine".
-Et nous allons pour commencer réaliser une ACP pour réduire la dimensionnalité et découvrir les corrélations entre les variables.
+Nous allons désormais réaliser une analyse exploratoire des regroupements possible de billets à l'aide de la méthode des K-means qui est une méthode non supervisée et qui nous donnera un aperçu du regroupement naturel des billets en fonction de leurs mesures sans tenir compte de l'information "vrai" et "faux" de "is_genuine". Et nous allons pour commencer réaliser une ACP pour réduire la dimensionnalité et découvrir les corrélations entre les variables.
 
 ### 1- Recherche de valeurs aberrantes
+
 #### a- Boxplot des variables
+
 ```{r}
 # Boxplot pour chaque variable numérique
 data_numeric <- data %>% select(where(is.numeric))
@@ -586,7 +587,9 @@ for (col in colnames(data_numeric)) {
 }
 
 ```
+
 #### b- Scatterplot des paires de variables
+
 ```{r}
 if (!require(GGally)) install.packages("GGally")
 library(GGally)
@@ -610,7 +613,6 @@ print(plot)
 ```
 
 La dispersion des points indique qu'il n'y a pas de corrélation évidente et linéaire entre 2 variables
-
 
 #### c- Méthode IQR
 
@@ -798,6 +800,7 @@ cumulative_inertia <- cumsum(pourcentage_inertie)
 ```
 
 #### a- Eboulis des Composantes Principales
+
 ```{r}
 # Créer un graphique avec un seul appel
 par(mfrow = c(1, 1)) # Assurez-vous d'avoir une seule fenêtre graphique
@@ -816,8 +819,8 @@ plot(cumulative_inertia, type = "o", col = "red", pch = 19,
 # Ajouter une légende
 legend("topright", legend = c("Inertie Cumulée (%)"), col = "red", pch = 19, inset = c(0, 0.5))
 ```
-On remarque avec l'ébouli qu'il est nécessaire d'avoir 5 composantes pour expliquer 90% de l'inertie des 6 variables.
-Il n'est pas très utile de réduire la dimensionalité dans notre si nous perdons en précision pour expliquer la variance.
+
+On remarque avec l'ébouli qu'il est nécessaire d'avoir 5 composantes pour expliquer 90% de l'inertie des 6 variables. Il n'est pas très utile de réduire la dimensionalité dans notre si nous perdons en précision pour expliquer la variance.
 
 Nous pouvons cependant réaliser l'ACP pour afficher le cercle des corrélations, notamment pour les 2 premières dimensions qui expliquent 60% de la variance totale.
 
@@ -873,7 +876,9 @@ head(scores)
 ```
 
 ### 4- Clustering avec K-means
+
 #### a- Méthode du coude
+
 ```{r}
 # Définir une plage de nombres de clusters à tester
 k_values <- 1:10  # Tester de 1 à 10 clusters
@@ -890,9 +895,9 @@ plot(k_values, wss, type = "b", pch = 19, col = "blue",
      xlab = "Nombre de Clusters", ylab = "Somme des Carrés Intra-Cluster",
      main = "Méthode du Coude pour K-means Clustering")
 ```
-La méthode du coude indique que l'ajout de clusters au-delà de 2 n'améliore plus significativement la dispersion intra-cluster, suggérant que 2 clusters est le nombre optimal.  
-En utilisant 2 clusters avec K-means, on obtient une séparation efficace des données tout en évitant une complexité inutile.
 
+La méthode du coude indique que l'ajout de clusters au-delà de 2 n'améliore plus significativement la dispersion intra-cluster, suggérant que 2 clusters est le nombre optimal.\
+En utilisant 2 clusters avec K-means, on obtient une séparation efficace des données tout en évitant une complexité inutile.
 
 #### b- Test avec 2 Clusters
 
@@ -934,7 +939,9 @@ plot_clusters <- plot_clusters +
 print(plot_clusters)
 
 ```
+
 Centroids :
+
 ```{r}
 # Centres des clusters
 print(kmeans_result$centers)
@@ -965,9 +972,7 @@ print(count_values)
   
 ```
 
-La répartition des "False" et "True" de chaque cluster nous indique que :
-- Le cluster 1 correspond aux faux billets avec 96.7 % de faux billets
-- Le cluster 2 correspond aux vrais billets avec 98.8 % de vrais billets
+La répartition des "False" et "True" de chaque cluster nous indique que : - Le cluster 1 correspond aux faux billets avec 96.7 % de faux billets - Le cluster 2 correspond aux vrais billets avec 98.8 % de vrais billets
 
 Naturellement la méthode des K-means a séparé notre jeu de donnée en 2 groupes avec une efficacité globale ou accuracy de 98.10 %.
 
@@ -1041,16 +1046,12 @@ count_values  <- data_with_clusters_2 %>%
 print(count_values)
   
 ```
-Ici nous avons :
-- cluster 1 avec 98.1 % de faux billets
-- cluster 2 avec 97.7 % de vrais billets
-- cluster 3 avec 99 % de vrais billets
-pour une efficacité globale de 98.3 %
+
+Ici nous avons : - cluster 1 avec 98.1 % de faux billets - cluster 2 avec 97.7 % de vrais billets - cluster 3 avec 99 % de vrais billets pour une efficacité globale de 98.3 %
 
 Il y a une meilleure efficacité au global, le cluster 3 atteint jusqu'à 99% de vrais billets mais cela ne nous aide pas énormément dans notre objectif de détecter les faux billets.
 
 Le but était de vérifier comment se comportait le modèle avec 3 clusters. L'idéal aurait été un clustering avec 100 % de vrai dans un cluster 100 % de faux dans un autre cluster et les douteux dans un 3ème cluster
-
 
 ## VII- Régression Logistique
 
@@ -1070,9 +1071,9 @@ head(data$is_genuine)
 ### 2- Régréssion logistique complète (toutes les variables)
 
 ```{r}
-reg_log <- glm(is_genuine~diagonal+height_left+height_right+margin_low+margin_up+length,
+rl_model <- glm(is_genuine~diagonal+height_left+height_right+margin_low+margin_up+length,
 family="binomial",data=data)
-summary(reg_log)
+summary(rl_model)
 ```
 
 Certaines des variables obtenues ont des p-valeurs qui sont inférieures au niveau de test de 5 %, ce qui nous indique qu'elles sont bien significatives. Certaines autres ne sont pas en dessous de ce seuil.
@@ -1083,26 +1084,23 @@ On peut donc passer sur une procédure de sélection en retirant les variables n
 
 ```{r}
 library(MASS)
-stepAIC(reg_log, direction = "both")
+stepAIC(rl_model, direction = "both")
 ```
-Critère AIC initial 97.22
-Après avoir retiré "diagonal", le modèle à le meilleur AIC avec 95.23.
-Les autres étapes de suppression de variable augmentent l'AIC ce qui indique qu'elles sont importantes pour le modèle.
+
+Critère AIC initial 97.22 Après avoir retiré "diagonal", le modèle à le meilleur AIC avec 95.23. Les autres étapes de suppression de variable augmentent l'AIC ce qui indique qu'elles sont importantes pour le modèle.
 
 La procédure de sélection de modèle nous a permis de déterminer que la variable "diagonal" n'était pas nécessaire pour le modèle final. Les variables restantes ("height_right", "height_right", "margin_low", "margin_up", et "length") sont significatives et ont un impact important sur le modèle.\
 Nous avons réussi à réduire l'AIC, indiquant que le modèle final est plus parcimonieux tout en conservant une bonne qualité d'ajustement.
 
-#### a- Analyse des coefficients  
+#### a- Analyse des coefficients
 
-3 variables ont une valeur absolue élevée ce qui indique qu'elles ont plus d'importance et d'influence dans la prédiction.  
+3 variables ont une valeur absolue élevée ce qui indique qu'elles ont plus d'importance et d'influence dans la prédiction.
 
-1 correspondant à la valeur "vrai" de is_genuine, un coefficient positif indique que si la valeur augmente, la probabilité de "vrai" billet augmente également
-inversement un coefficient négatif indique que plus la valeur de la variable augmente plus la probabilité d'un "faux" billet augmente également.
+1 correspondant à la valeur "vrai" de is_genuine, un coefficient positif indique que si la valeur augmente, la probabilité de "vrai" billet augmente également inversement un coefficient négatif indique que plus la valeur de la variable augmente plus la probabilité d'un "faux" billet augmente également.
 
-- "margin_up" a un coeff négatif de -10.203 ce qui indique que plus la marge haute augmente, plus il y a de chance qu'il s'agisse d'un faux billet.  
-- "margin_low" avec un coeff négatif également de -5.910 a également une influence importante et indique que l'augmentation de la marge basse augmente les probabilités qu'il s'agisse d'un faux billet.  
-- "length" a un coeff positif de 5.988 qui indique à l'inverse que l'augmentation de la longueur du billet augmente la probabilité qu'il s'agisse d'un vrai billet.
-
+-   "margin_up" a un coeff négatif de -10.203 ce qui indique que plus la marge haute augmente, plus il y a de chance qu'il s'agisse d'un faux billet.\
+-   "margin_low" avec un coeff négatif également de -5.910 a également une influence importante et indique que l'augmentation de la marge basse augmente les probabilités qu'il s'agisse d'un faux billet.\
+-   "length" a un coeff positif de 5.988 qui indique à l'inverse que l'augmentation de la longueur du billet augmente la probabilité qu'il s'agisse d'un vrai billet.
 
 #### b- Odds Ratios
 
@@ -1151,14 +1149,14 @@ La matrice de confusion permet de comparer les prédictions du modèle avec les 
 
 ```{r}
 # Prédictions du modèle
-predic_rl_model_1 <- predict(rl_model_1, type = "response")
+predictions <- predict(rl_model_1, type = "response")
 
 # Convertir les probabilités en classes (0 ou 1) en utilisant un seuil de 0.5
-rl_model_1_classes <- ifelse(predic_rl_model_1 > 0.5, "True", "False")
+classes <- ifelse(predictions > 0.5, "True", "False")
 
 # Créer la matrice de confusion
-confusion_rl_model_1 <- table(Predicted = rl_model_1_classes, Actual = data$is_genuine)
-print(confusion_rl_model_1)
+conf_matrix <- table(Predicted = classes, Actual = data$is_genuine)
+print(conf_matrix)
 
 ```
 
@@ -1167,9 +1165,7 @@ Faux Négatifs (FN) : 4\
 Faux Positifs (FP) : 9\
 Vrais Positifs (VP) : 996
 
-Pour une probabilité supérieur à 0.5, le billet est prédit comme bon et en dessous de 0.5 le billet est prédit comme faux.
-La matrice de confusion montre que le modèle a une très bonne performance en classant les cas True et False correctement avec peu d'erreurs avec un seuil à 0.5.
-
+Pour une probabilité supérieur à 0.5, le billet est prédit comme bon et en dessous de 0.5 le billet est prédit comme faux. La matrice de confusion montre que le modèle a une très bonne performance en classant les cas True et False correctement avec peu d'erreurs avec un seuil à 0.5.
 
 ##### Mesures de performance
 
@@ -1180,12 +1176,12 @@ F1-Score : Moyenne harmonique de la précision et de la sensibilité. 2x((precis
 
 ```{r}
 # Calculer les mesures de performance
-precision_rl_model_1 <- confusion_rl_model_1[2, 2] / (confusion_rl_model_1[2, 2] + confusion_rl_model_1[2, 1])
-recall_rl_model_1 <- confusion_rl_model_1[2, 2] / (confusion_rl_model_1[2, 2] + confusion_rl_model_1[1, 2])
-specificity_rl_model_1 <- confusion_rl_model_1[1, 1] / (confusion_rl_model_1[1, 1] + confusion_rl_model_1[2, 1])
+precision_rl_model_1 <- conf_matrix[2, 2] / (conf_matrix[2, 2] + conf_matrix[2, 1])
+recall_rl_model_1 <- conf_matrix[2, 2] / (conf_matrix[2, 2] + conf_matrix[1, 2])
+specificity_rl_model_1 <- conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[2, 1])
 f1_score_rl_model_1 <- 2 * (precision_rl_model_1 * recall_rl_model_1) / (precision_rl_model_1 + recall_rl_model_1)
 # Calculer Accuracy
-accuracy_rl_model_1 <- (confusion_rl_model_1[1, 1] + confusion_rl_model_1[2, 2]) / sum(confusion_rl_model_1)      # (TP + TN) / Total
+accuracy_rl_model_1 <- (conf_matrix[1, 1] + conf_matrix[2, 2]) / sum(conf_matrix)      # (TP + TN) / Total
 
 # Afficher les résultats
 cat("Précision: ", precision_rl_model_1, "\n")
@@ -1215,7 +1211,7 @@ if (!require(pROC)) install.packages("pROC")
 library(pROC)
 
 # Calculer la courbe ROC
-roc_curve <- roc(data$is_genuine, predic_rl_model_1)
+roc_curve <- roc(data$is_genuine, predictions)
 
 # Tracer la courbe ROC
 plot(roc_curve, main = "Courbe ROC")
@@ -1280,19 +1276,18 @@ Conclusion Ces résultats montrent que le modèle de régression logistique est 
 Prochaines Étapes Validation Externe : Si possible, testez le modèle sur un jeu de données complètement indépendant pour vérifier sa généralisation. Analyse des Résidus : Examinez les résidus pour identifier tout modèle non détecté ou problème potentiel. Exploration de Modèles Alternatifs : Bien que le modèle de régression logistique semble excellent, vous pouvez explorer d'autres modèles pour comparer les performances. Implémentation et Déploiement : Si le modèle répond à vos attentes, vous pouvez envisager de l'implémenter dans un environnement de production. Ces étapes vous aideront à assurer que votre modèle est non seulement performant mais aussi robuste et fiable dans des conditions réelles.
 
 ------------------------------------------------------------------------
+
 ### 5- Amélioration du modèle
 
 Nous allons ajuster le seuil pour réduire la probabilité de classer un faux billet parmis les vrais, c'est à dire minimiser le risque de faux positifs.
 
-
 ```{r}
-head(predic_rl_model_1)
+head(predictions)
 ```
 
 #### a- Ajustement du seuil pour réduire le taux de faux positifs
 
-La mesure de performance concernant la détection des faux billets est la spécificité dont le calcul est le suivant : VN/(VN+FP)
-Cela nous donne la proportion de vrais négatifs détectés parmi les négatifs.
+La mesure de performance concernant la détection des faux billets est la spécificité dont le calcul est le suivant : VN/(VN+FP) Cela nous donne la proportion de vrais négatifs détectés parmi les négatifs.
 
 ##### Création d'une fonction pour calculer la spécificité
 
@@ -1315,7 +1310,7 @@ Plage de seuils à tester
 ```{r}
 thresholds <- seq(0.5, 0.99, by = 0.01)
 specificities <- sapply(thresholds, function(t) {
-  calculate_specificity(predic_rl_model_1, data$is_genuine, t)
+  calculate_specificity(predictions, data$is_genuine, t)
 })
 ```
 
@@ -1330,17 +1325,19 @@ cat("Spécificité à ce seuil:", best_specificity, "\n")
 ```
 
 #### b- Métrique de performance
+
 ##### Matrice de confusion
 
 On applique ce seuil optimal à notre modèle pour obtenir les prédictions finales
 
 ```{r}
-final_predictions <- ifelse(predic_rl_model_1 > best_threshold, "True", "False")
-final_confusion_matrix <- table(final_predictions, Actual = data$is_genuine)
-print(final_confusion_matrix)
+final_predictions <- ifelse(predictions > best_threshold, "True", "False")
+final_conf_matrix <- table(final_predictions, Actual = data$is_genuine)
+print(final_conf_matrix)
 ```
 
 Avec ce modèle et ce seuil de sensibilité, on obtient un résultat intéressant pour le nombre de faux positif. Il n'y a qu'un seul faux billet détecté comme positif sur les 1500 billets de notre jeu de donnée.
+
 ```{r}
 taux_erreur <- 1/1500 * 100
 print(paste("le taux de faux positif est de", format(taux_erreur, digits = 1, nsmall = 1), "% avec ce modèle et ce seuil"))
@@ -1350,26 +1347,26 @@ print(paste("le taux de faux positif est de", format(taux_erreur, digits = 1, ns
 
 ```{r}
 # Calculer les mesures de performance
-precision_2 <- final_confusion_matrix[2, 2] / (final_confusion_matrix[2, 2] + final_confusion_matrix[2, 1])
-recall_2 <- final_confusion_matrix[2, 2] / (final_confusion_matrix[2, 2] + final_confusion_matrix[1, 2])
-specificity_2 <- final_confusion_matrix[1, 1] / (final_confusion_matrix[1, 1] + final_confusion_matrix[2, 1])
-f1_score_2 <- 2 * (precision_2 * recall_2) / (precision_2 + recall_2)
+precision_rl_model_2 <- final_conf_matrix[2, 2] / (final_conf_matrix[2, 2] + final_conf_matrix[2, 1])
+recall_rl_model_2 <- final_conf_matrix[2, 2] / (final_conf_matrix[2, 2] + final_conf_matrix[1, 2])
+specificity_rl_model_2 <- final_conf_matrix[1, 1] / (final_conf_matrix[1, 1] + final_conf_matrix[2, 1])
+f1_score_rl_model_2 <- 2 * (precision_rl_model_2 * recall_rl_model_2) / (precision_rl_model_2 + recall_rl_model_2)
 # Calculer Accuracy
-accuracy_2 <- (final_confusion_matrix[1, 1] + final_confusion_matrix[2, 2]) / sum(final_confusion_matrix)      # (TP + TN) / Total
+accuracy_rl_model_2 <- (final_conf_matrix[1, 1] + final_conf_matrix[2, 2]) / sum(final_conf_matrix)      # (TP + TN) / Total
 # Afficher les résultats
-cat("Précision: ", precision_2, "\n")
-cat("Sensibilité (Recall): ", recall_2, "\n")
-cat("Spécificité: ", specificity_2, "\n")
-cat("F1-Score: ", f1_score_2, "\n")
-cat("Accuracy: ", accuracy_2, "\n")
+cat("Précision: ", precision_rl_model_2, "\n")
+cat("Sensibilité (Recall): ", recall_rl_model_2, "\n")
+cat("Spécificité: ", specificity_rl_model_2, "\n")
+cat("F1-Score: ", f1_score_rl_model_2, "\n")
+cat("Accuracy: ", accuracy_rl_model_2, "\n")
 ```
 
 ```{r}
-print(paste("L'éfficacité golobale (accuracy) du modèle avec un seuil de 0.5 était de", round(accuracy_rl_model_1*100, 2), "% tandis que pour le second avec le seuil qui réduit au maximum le risque de faux positif, l'éfficacité globale est de", round(accuracy_2*100, 2), "%"))
+print(paste("L'éfficacité golobale (accuracy) du modèle avec un seuil de 0.5 était de", round(accuracy_rl_model_1*100, 2), "% tandis que pour le second avec le seuil qui réduit au maximum le risque de faux positif, l'éfficacité globale est de", round(accuracy_rl_model_2*100, 2), "%"))
 ```
 
-En regardant les performances globales, on voit que nous avons effectivement amélioré la Spécificité, c'est à dire réduire le risque de faux positifs, passant d'une spécificité de 98.2% à 99.8%.  
-99.8% des faux billets sont donc détectés dans notre jeu de données initial.  
+En regardant les performances globales, on voit que nous avons effectivement amélioré la Spécificité, c'est à dire réduire le risque de faux positifs, passant d'une spécificité de 98.2% à 99.8%.\
+99.8% des faux billets sont donc détectés dans notre jeu de données initial.\
 Nous avons également augmenté la précision passant de 0.991 à 0.998, cela signifie que 99.8% des billets classés dans "True" sont réellement vrais.
 
 Cependant nous avons une baisse de sensibilité passant de 0.996 à 0.952 ce qui signifie que seulement 95.2 % des vrais billets sont identifiés et classés comme tel, donc 4.8 % de vrais billets sont considérés comme faux par le modèle. et une baisse du F1_score passant de 0.993 à 0.97, c'est à dire un moins bon équilibre entre détection des faux et des vrais billets dans le global.
@@ -1420,12 +1417,20 @@ rf_predictions <- predict(rf_model, testFeatures)
 rf_predictions <- factor(rf_predictions, levels = levels(testTarget))
 
 # Évaluer le modèle
-confusionMatrix(rf_predictions, testTarget)
+rf_conf_matrix <- confusionMatrix(rf_predictions, testTarget)
+print(rf_conf_matrix)
 
 ```
 
-Utilisation des variables déterminées par StepAIC pour voir si cela améliore le modèle Randomforest
+```{r}
+rf_accuracy <- rf_conf_matrix$overall['Accuracy']
+rf_specificity <- rf_conf_matrix$byClass['Specificity']
+rf_sensitivity <- rf_conf_matrix$byClass['Sensitivity']
+rf_precision <- rf_conf_matrix$byClass['Pos Pred Value']
+rf_f1_score <- 2 * (rf_precision * rf_sensitivity) / (rf_precision + rf_sensitivity)
+```
 
+Utilisation des variables déterminées par StepAIC pour voir si cela améliore le modèle Randomforest
 
 ```{r}
 # Préparer les données pour Random Forest en utilisant les variables sélectionnées
@@ -1451,21 +1456,23 @@ predictions_2 <- predict(rf_model_2, newdata = testData_selected)
 
 # Calculer la matrice de confusion et d'autres statistiques
 library(caret)
-confusionMatrix(predictions_2, testData_selected$is_genuine, positive = "1")
-
+rf2_conf_matrix <- confusionMatrix(predictions_2, testData_selected$is_genuine, positive = "1")
+print(rf2_conf_matrix)
 ```
+
 Les statistiques sont assez proche.
 
+```{r}
+rf2_accuracy <- rf2_conf_matrix$overall['Accuracy']
+rf2_specificity <- rf2_conf_matrix$byClass['Specificity']
+rf2_sensitivity <- rf2_conf_matrix$byClass['Sensitivity']
+rf2_precision <- rf2_conf_matrix$byClass['Pos Pred Value']
+rf2_f1_score <- 2 * (rf2_precision * rf2_sensitivity) / (rf2_precision + rf2_sensitivity)
+```
 
 #### b- Méthode de Réseau Neuronal
 
-```{r}
-print(head(data))
-print(summary(data))
-print(str(data))
-```
-
-------------------------------------------------------------------------
+Utilisation de la librairie "reticulate" qui intègre python dans R Choix de l'environnement Conda utilisé (contient les installations spécifiques pour l'utilisation de Tensorflow et keras) Chargement des librairie
 
 ```{r}
 library(reticulate)
@@ -1473,21 +1480,11 @@ library(reticulate)
 # Utilisez le nouvel environnement Conda
 use_condaenv("tf-env", required = TRUE)
 
+library(keras)
+
 # Vérifiez la configuration de Python
 py_config()
 
-```
-
-```{r}
-library(keras)
-use_condaenv("tf-env", required=T)
-```
-
-Check if graphics card (GPU) is detected:
-
-```{r}
-library(tensorflow)
-tf$python$client$device_lib$list_local_devices()
 ```
 
 ```{r}
@@ -1510,6 +1507,8 @@ y_test <- as.matrix(test_data$is_genuine)
 
 ```
 
+Modèle 1 Réseau simple sans régularisation
+
 ```{r}
 library(keras)
 
@@ -1518,24 +1517,50 @@ model_neuronal_1 <- keras_model_sequential() %>%
   layer_dense(units = 32, activation = 'relu', input_shape = c(ncol(x_train))) %>%
   layer_dense(units = 16, activation = 'relu') %>%
   layer_dense(units = 1, activation = 'sigmoid')
-
-```
-
-```{r}
 # Compiler le modèle
 model_neuronal_1 %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(),
   metrics = c('accuracy')
 )
+# Évaluer le modèle
+score1 <- model_neuronal_1 %>% evaluate(x_test, y_test, positive ="1")
+print(score1)
+```
+
+Le modèle 1 est assez simple et n'inclut aucune forme de régularisation. Il pourrait avoir un certain degré de surajustement (overfitting) ou de sous-ajustement (underfitting), mais la précision de 70 % montre qu'il capture une partie des relations dans les données. La perte est relativement élevée, indiquant que le modèle pourrait être amélioré.
+
+```{r}
+# Faire des prédictions sur les données de test
+predictions <- model_neuronal_1 %>% predict(x_test)
+
+# Convertir les probabilités en classes (0 ou 1) en utilisant un seuil de 0.5
+classes <- ifelse(predictions > 0.5, 1, 0)
+
+# Créer la matrice de confusion
+conf_matrix <- confusionMatrix(as.factor(classes), as.factor(y_test), positive ="1")
+
+# Afficher la matrice de confusion
+print(conf_matrix)
 
 ```
 
 ```{r}
-# Évaluer le modèle
-score1 <- model_neuronal_1 %>% evaluate(x_test, y_test)
-print(score1)
+# Extraire les métriques
+accuracy_neurone_1 <- conf_matrix$overall['Accuracy']
+specificity_neurone_1 <- conf_matrix$byClass['Specificity']
+sensitivity_neurone_1 <- conf_matrix$byClass['Sensitivity']
+f1_score_neurone_1 <- conf_matrix$byClass['F1']
+
+# Afficher les résultats
+cat("Accuracy:", accuracy_neurone_1, "\n")
+cat("Specificity:", specificity_neurone_1, "\n")
+cat("Sensitivity:", sensitivity_neurone_1, "\n")
+cat("F1 Score:", f1_score_neurone_1, "\n")
+
 ```
+
+Modèle 2 Ajout de dropout pour régularisation et taille de couche plus élevée (désactivation de certains neurones pour éviter le surapprentissage)
 
 ```{r}
 # Créer le modèle
@@ -1546,24 +1571,50 @@ model_neuronal_2 <- keras_model_sequential() %>%
   layer_dropout(rate = 0.5) %>%
   layer_dense(units = 16, activation = 'relu') %>%
   layer_dense(units = 1, activation = 'sigmoid')
-
-```
-
-```{r}
 # Compiler le modèle
 model_neuronal_2 %>% compile(
   loss = 'binary_crossentropy',
   optimizer = optimizer_adam(learning_rate = 0.001),
   metrics = c('accuracy')
 )
-
-```
-
-```{r}
 # Évaluer le modèle
 score2 <- model_neuronal_2 %>% evaluate(x_test, y_test)
 print(score2)
 ```
+
+Le modèle 2, bien que plus complexe et régularisé avec Dropout, a une performance plus faible que le modèle 1. Cela pourrait être dû à une sur-régularisation, où le modèle perd trop d'information lors du processus de régularisation. De plus, l'architecture plus grande pourrait nécessiter un entraînement plus long ou des ajustements supplémentaires.
+
+```{r}
+# Faire des prédictions sur les données de test
+predictions <- model_neuronal_2 %>% predict(x_test)
+
+# Convertir les probabilités en classes (0 ou 1) en utilisant un seuil de 0.5
+classes <- ifelse(predictions > 0.5, 1, 0)
+
+# Créer la matrice de confusion
+conf_matrix <- confusionMatrix(as.factor(classes), as.factor(y_test), positive ="1")
+
+# Afficher la matrice de confusion
+print(conf_matrix)
+
+```
+
+```{r}
+# Extraire les métriques
+accuracy_neurone_2 <- conf_matrix$overall['Accuracy']
+specificity_neurone_2 <- conf_matrix$byClass['Specificity']
+sensitivity_neurone_2 <- conf_matrix$byClass['Sensitivity']
+f1_score_neurone_2 <- conf_matrix$byClass['F1']
+
+# Afficher les résultats
+cat("Accuracy:", accuracy_neurone_2, "\n")
+cat("Specificity:", specificity_neurone_2, "\n")
+cat("Sensitivity:", sensitivity_neurone_2, "\n")
+cat("F1 Score:", f1_score_neurone_2, "\n")
+
+```
+
+Modèle 3 simplifié sans dropout mais entrainé sur 20 époques
 
 ```{r}
 # Créer un modèle plus simple
@@ -1594,159 +1645,187 @@ print(score_simplified)
 
 ```
 
-```{r}
-# Créer un modèle avec Dropout
-model_neuronal_dropout <- keras_model_sequential() %>%
-  layer_dense(units = 64, activation = 'relu', input_shape = c(ncol(x_train))) %>%
-  layer_dropout(rate = 0.5) %>%
-  layer_dense(units = 32, activation = 'relu') %>%
-  layer_dropout(rate = 0.5) %>%
-  layer_dense(units = 16, activation = 'relu') %>%
-  layer_dense(units = 1, activation = 'sigmoid')
-
-# Compiler le modèle
-model_neuronal_dropout %>% compile(
-  loss = 'binary_crossentropy',
-  optimizer = optimizer_adam(learning_rate = 0.001),
-  metrics = c('accuracy')
-)
-
-# Entraîner le modèle
-history_dropout <- model_neuronal_dropout %>% fit(
-  x_train, y_train,
-  epochs = 20,
-  batch_size = 32,
-  validation_split = 0.2
-)
-
-# Évaluer le modèle
-score_dropout <- model_neuronal_dropout %>% evaluate(x_test, y_test)
-print(score_dropout)
-
-```
+Le modèle 3 est de loin le plus performant parmi les trois. La faible perte et la haute précision indiquent qu'il est très bien ajusté aux données. Cependant, il pourrait aussi y avoir un risque de surajustement (overfitting), car la performance sur l'ensemble de test est très proche de celle sur l'ensemble d'entraînement. L'absence de Dropout pourrait expliquer pourquoi le modèle performe aussi bien, mais cela signifie aussi que la généralisation à des données non vues pourrait poser problème si la complexité des données augmente.
 
 ```{r}
-library(keras)
+# Faire des prédictions sur les données de test
+predictions <- model_neuronal_simplified %>% predict(x_test)
 
-# Créer un modèle avec Dropout
-model_neuronal_3 <- keras_model_sequential() %>%
-  layer_dense(units = 64, activation = 'relu', input_shape = c(ncol(x_train))) %>%
-  layer_dropout(rate = 0.5) %>%
-  layer_dense(units = 32, activation = 'relu') %>%
-  layer_dropout(rate = 0.5) %>%
-  layer_dense(units = 16, activation = 'relu') %>%
-  layer_dense(units = 1, activation = 'sigmoid')
+# Convertir les probabilités en classes (0 ou 1) en utilisant un seuil de 0.5
+classes <- ifelse(predictions > 0.5, 1, 0)
 
-# Compiler le modèle
-model_neuronal_3 %>% compile(
-  loss = 'binary_crossentropy',
-  optimizer = optimizer_adam(learning_rate = 0.001),
-  metrics = c('accuracy')
-)
+# Créer la matrice de confusion
+conf_matrix <- confusionMatrix(as.factor(classes), as.factor(y_test), positive ="1")
 
-# Ajouter un callback pour l'arrêt précoce
-early_stopping <- callback_early_stopping(
-  monitor = 'val_loss',
-  patience = 3,
-  restore_best_weights = TRUE
-)
-
-# Entraîner le modèle
-history <- model_neuronal_3 %>% fit(
-  x_train, y_train,
-  epochs = 20,
-  batch_size = 32,
-  validation_split = 0.2,
-  callbacks = list(early_stopping)
-)
-
-# Évaluer le modèle
-score3 <- model_neuronal_3 %>% evaluate(x_test, y_test)
-print(score3)
-
-```
-
-```{r}
-library(keras)
-
-# Créer un modèle avec Dropout
-model_neuronal_4 <- keras_model_sequential() %>%
-  layer_dense(units = 64, activation = 'relu', input_shape = c(ncol(x_train))) %>%
-  layer_dropout(rate = 0.5) %>%
-  layer_dense(units = 32, activation = 'relu') %>%
-  layer_dropout(rate = 0.5) %>%
-  layer_dense(units = 16, activation = 'relu') %>%
-  layer_dense(units = 1, activation = 'sigmoid')
-
-# Compiler le modèle
-model_neuronal_4 %>% compile(
-  loss = 'binary_crossentropy',
-  optimizer = optimizer_adam(learning_rate = 0.001),
-  metrics = c('accuracy')
-)
-
-# Ajouter un callback pour l'arrêt précoce
-early_stopping <- callback_early_stopping(
-  monitor = 'val_loss',
-  patience = 3,
-  restore_best_weights = TRUE
-)
-
-# Entraîner le modèle
-history <- model_neuronal_4 %>% fit(
-  x_train, y_train,
-  epochs = 20,
-  batch_size = 32,
-  validation_split = 0.2,
-  callbacks = list(early_stopping)
-)
-
-# Évaluer le modèle
-score4 <- model_neuronal_4 %>% evaluate(x_test, y_test)
-print(score4)
-
-```
-
-```{r}
-# 1. Faire des prédictions sur les données de test
-y_pred <- model_neuronal_4 %>% predict(x_test)
-
-# 2. Convertir les probabilités en classes (0 ou 1)
-y_pred_class <- ifelse(y_pred > 0.5, 1, 0)
-
-# 3. Créer la matrice de confusion
-conf_matrix <- table(Predicted = y_pred_class, Actual = y_test)
-
-# 4. Afficher la matrice de confusion
+# Afficher la matrice de confusion
 print(conf_matrix)
 
 ```
 
 ```{r}
-# Installer et charger le package caret si ce n'est pas déjà fait
-# install.packages("caret")
-library(caret)
+# Extraire les métriques
+accuracy_neurone_3 <- conf_matrix$overall['Accuracy']
+specificity_neurone_3 <- conf_matrix$byClass['Specificity']
+sensitivity_neurone_3 <- conf_matrix$byClass['Sensitivity']
+f1_score_neurone_3 <- conf_matrix$byClass['F1']
 
-# Utiliser caret pour obtenir une matrice de confusion plus détaillée
-cm_reseau_neuronal <- confusionMatrix(as.factor(y_pred_class), as.factor(y_test))
-cm_reseau_neuronal
+# Afficher les résultats
+cat("Accuracy:", accuracy_neurone_3, "\n")
+cat("Specificity:", specificity_neurone_3, "\n")
+cat("Sensitivity:", sensitivity_neurone_3, "\n")
+cat("F1 Score:", f1_score_neurone_3, "\n")
+
+```
+
+Modèle 4 Dropout : Ajout d'un taux de 30 % de Dropout après chaque couche dense pour éviter que le modèle ne s'ajuste trop fortement aux données d'entraînement.
+
+Régularisation L2 : Ajout d'une pénalisation L2 avec un coefficient de régularisation de 0.001 sur chaque couche dense pour limiter l'importance des poids.
+
+Ajustement du taux d'apprentissage : Utilisation d'un plan de décroissance exponentielle du taux d'apprentissage pour affiner l'apprentissage avec le temps.
+
+Early Stopping : Le modèle s'arrêtera automatiquement si la performance de validation ne s'améliore plus après 10 époques, et restaurera les meilleurs poids enregistrés.
+
+Avantages :\
+Meilleure généralisation : Grâce à la régularisation et au Dropout.\
+Convergence optimale : Ajustement fin du taux d'apprentissage et contrôle du surapprentissage avec l'Early Stopping.
+
+```{r}
+# Stratégie d'ajustement du taux d'apprentissage (exponential decay)
+learning_rate_schedule <- learning_rate_schedule_exponential_decay(
+  initial_learning_rate = 0.001,
+  decay_steps = 10000,
+  decay_rate = 0.96,
+  staircase = TRUE
+)
+
+# Optimizer avec le learning rate schedule
+optimizer <- optimizer_adam(learning_rate = learning_rate_schedule)
+
+# Créer le modèle amélioré avec Dropout et régularisation L2
+model_neuronal_ameliore <- keras_model_sequential() %>%
+  layer_dense(units = 64, activation = 'relu', 
+              kernel_regularizer = regularizer_l2(0.001), input_shape = c(ncol(x_train))) %>%
+  layer_dropout(rate = 0.3) %>%  # Dropout de 30% après la première couche
+  layer_dense(units = 32, activation = 'relu', 
+              kernel_regularizer = regularizer_l2(0.001)) %>%
+  layer_dropout(rate = 0.3) %>%  # Dropout de 30% après la deuxième couche
+  layer_dense(units = 16, activation = 'relu', 
+              kernel_regularizer = regularizer_l2(0.001)) %>%
+  layer_dense(units = 1, activation = 'sigmoid')  # Couche de sortie pour la classification binaire
+
+# Compiler le modèle
+model_neuronal_ameliore %>% compile(
+  loss = 'binary_crossentropy',
+  optimizer = optimizer,
+  metrics = c('accuracy')
+)
+
+# Callback d'arrêt anticipé (Early Stopping)
+early_stopping <- callback_early_stopping(
+  monitor = "val_loss",  # Surveiller la perte sur l'ensemble de validation
+  patience = 10,         # Nombre d'époques sans amélioration avant d'arrêter
+  restore_best_weights = TRUE  # Restaurer les meilleurs poids
+)
+
+# Entraîner le modèle avec validation_split et arrêt anticipé
+history <- model_neuronal_ameliore %>% fit(
+  x_train, y_train,
+  epochs = 50,  # Augmenter le nombre d'époques
+  batch_size = 32,
+  validation_split = 0.2,  # Utiliser 20% des données pour la validation
+  callbacks = list(early_stopping)
+)
+
+# Évaluer le modèle sur les données de test
+score_ameliore <- model_neuronal_ameliore %>% evaluate(x_test, y_test)
+print(score_ameliore)
+
+
+```
+
+```{r}
+# Faire des prédictions sur les données de test
+predictions <- model_neuronal_ameliore %>% predict(x_test)
+
+# Convertir les probabilités en classes (0 ou 1) en utilisant un seuil de 0.5
+classes <- ifelse(predictions > 0.5, 1, 0)
+
+# Créer la matrice de confusion
+conf_matrix <- confusionMatrix(as.factor(classes), as.factor(y_test), positive ="1")
+
+# Afficher la matrice de confusion
+print(conf_matrix)
+
+```
+
+```{r}
+# Extraire les métriques
+accuracy_neurone_4 <- conf_matrix$overall['Accuracy']
+specificity_neurone_4 <- conf_matrix$byClass['Specificity']
+sensitivity_neurone_4 <- conf_matrix$byClass['Sensitivity']
+f1_score_neurone_4 <- conf_matrix$byClass['F1']
+
+# Afficher les résultats
+cat("Accuracy:", accuracy_neurone_4, "\n")
+cat("Specificity:", specificity_neurone_4, "\n")
+cat("Sensitivity:", sensitivity_neurone_4, "\n")
+cat("F1 Score:", f1_score_neurone_4, "\n")
+
 ```
 
 COMPARAISON DES PERFORMANCES ENTRE LES MODELES
 
 ```{r}
-model_neuronal_accuracy <- cm_reseau_neuronal$overall["Accuracy"]
-model_neuronal_accuracy
+# Installer et charger le package tibble pour une meilleure gestion des tableaux (si ce n'est pas déjà fait)
+if (!require(tibble)) install.packages("tibble")
+library(tibble)
+
+# Créer un tableau de comparaison
+results <- tibble(
+  Model = c("Regression Logistique", "Regression Logistique opti", "Random Forest modele 1", "Random Forest modele 2",
+            "Réseau neuronale 1", "Réseau neuronale 2", "Réseau neuronale 3", "Réseau neuronale 4"),
+  Accuracy = c(accuracy_rl_model_1, accuracy_rl_model_2, rf_accuracy, rf2_accuracy,
+                accuracy_neurone_1, accuracy_neurone_2, accuracy_neurone_3, accuracy_neurone_4),
+  Specificity = c(specificity_rl_model_1, specificity_rl_model_2, rf_specificity, rf2_specificity,
+                   specificity_neurone_1, specificity_neurone_2, specificity_neurone_3, specificity_neurone_4),
+  Sensitivity = c(recall_rl_model_1, recall_rl_model_2, rf_sensitivity, rf2_sensitivity,
+                   sensitivity_neurone_1, sensitivity_neurone_2, sensitivity_neurone_3, sensitivity_neurone_4),
+  F1_Score = c(f1_score_rl_model_1, f1_score_rl_model_2, rf_f1_score, rf2_f1_score,
+               f1_score_neurone_1, f1_score_neurone_2, f1_score_neurone_3, f1_score_neurone_4)
+)
+
+# Afficher le tableau
+print(results)
+
 
 ```
 
-Sauvegarde du modèle à utiliser
+Accuracy : Taux global de prédiction correcte. Specificity : Capacité à identifier les véritables négatifs. Sensitivity : Capacité à identifier les véritables positifs. F1 Score : Moyenne harmonique de la précision et du rappel, utile pour évaluer la performance dans des contextes déséquilibrés.
+
+```{r}
+library(ggplot2)
+
+# Réorganiser les données pour le graphique
+results_long <- results %>%
+  pivot_longer(cols = c(Accuracy, Specificity, Sensitivity, F1_Score), names_to = "Metric", values_to = "Value")
+
+# Créer un graphique comparatif
+ggplot(results_long, aes(x = Model, y = Value, fill = Metric)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Comparison of Model Performances", x = "Model", y = "Value")
+
+```
+
+Sauvegarde du modèle à utiliser Modèle réseau neuronal 4
 
 ```{r}
 # Sauvegarder le modèle neuronales (librairie keras)
-model_neuronal_4 %>% save_model_hdf5("model_faux_billets.h5")
+model_neuronal_ameliore %>% save_model_hdf5("model_faux_billets.h5")
 
 ```
+
+Modèle régréssion logistique opti il correspond à rl_model_1 avec application du seuil optimal
 
 ```{r}
 # Sauvegarder le modèle et le seuil
